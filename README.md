@@ -6,38 +6,32 @@
 
 ---
 
-### **Comprehensive Roadmap for Uphbt: A .NET 9 Web API with Rich Domain Model**
-
-**Project Goal: To develop a robust, maintainable, and scalable Universal Productivity Hub Bug Tracker (Uphbt) API and its accompanying frontends using modern .NET practices, adhering to a layered architecture with a rich domain model, and leveraging AI for accelerated development.**
-
----
+**Overall Project Goal: To develop a comprehensive bug and project tracking system comprising a robust .NET Web API backend and two distinct Single Page Application (SPA) frontends (Angular and React), serving as a significant upskilling exercise.**
 
 **Overall Technology Stack:**
 
 * **Backend: .NET Web API (latest LTS \- .NET 9\) with C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types), Swagger/OpenAPI for API Documentation. Business logic will be primarily implemented in the Rich Domain Model layer, with the Service layer handling orchestration and logic that cannot be performed by entities themselves.**  
-* **Database: SQL Server**  
-* **ORM: Entity Framework Core**  
-* **Frontend 1 (Angular): Bug Tracker (Full Features) \- Angular 19 (LTS) \- Using ReactiveFormsModule and Angular Material UI Library (with Proxy for Dev)**  
-* **Frontend 2 (React): Bug Tracker (Full Features \- Mirror of Angular) \- React 19 (Stable) \- Using React Hook Form and Material UI (MUI) Library (with Proxy for Dev)**  
-* **Authentication: JWT with Refresh Tokens & BCrypt.Net-Next for password hashing**  
-* **Real-time: SignalR**  
-* **Internationalization & Localization (i18n/l10n):**  
-  * **.NET: Microsoft.Extensions.Localization, Microsoft.AspNetCore.Localization**  
-  * **Angular: ngx-translate**  
-  * **React: i18next & react-i18next**  
+  * **Database: SQL Server (latest stable version).**  
+  * **ORM: Entity Framework Core.**  
+  * **Authentication: OpenIddict (for OAuth 2.0 / OpenID Connect with JWTs and Refresh Tokens), ASP.NET Core Identity (for user management), BCrypt.Net-Next for password hashing. BFF Pattern for SPA authentication with `HttpOnly` cookies.**  
+  * **Real-time Communication: ASP.NET Core SignalR.**  
+  * **Internationalization & Localization (i18n/l10n): `Microsoft.Extensions.Localization`, `Microsoft.AspNetCore.Localization`.**  
+  * **Logging: Serilog.**  
+* **Frontend 1 (Angular): Bug Tracker (Full Features) \- Angular (v20 LTS) \- Using ReactiveFormsModule and Angular Material UI Library (with Proxy for Dev).**  
+  * **Internationalization & Localization (i18n/l10n): `ngx-translate`.**  
+* **Frontend 2 (React): Bug Tracker (Full Features \- Mirror of Angular) \- React (v19 LTS) \- Using React Hook Form and Material UI (MUI) Library (with Proxy for Dev).**  
+  * **Internationalization & Localization (i18n/l10n): `i18next` & `react-i18next`.**  
 * **Testing:**  
-  * **.NET: xUnit, Moq, Microsoft.AspNetCore.Mvc.Testing**  
-  * **Angular: Jasmine, Karma, Angular Testing Bed, HttpClientTestingModule**  
-  * **React: Jest, React Testing Library, MSW (Mock Service Worker)**  
-  * **E2E: Cypress or Playwright**  
-* **Deployment (Local/Shareable): Docker & Docker Compose**  
+  * **.NET: xUnit, Moq, Microsoft.AspNetCore.Mvc.Testing.**  
+  * **Angular: Jasmine, Karma, Angular Testing Bed, HttpClientTestingModule.**  
+  * **React: Jest, React Testing Library, MSW (Mock Service Worker).**  
+* **E2E: Cypress or Playwright.**  
+* **Deployment (Local/Shareable): Docker & Docker Compose.**  
 * **AI Strategy: Extensive use of LLM for code generation, test scaffolding, cross-framework translation, debugging, and concept explanation. Critical human review and understanding for all AI-generated code.**  
-* **Source Control: Git (with a feature branching workflow)**  
-* **Estimated Timeline: 4 \- 6 months (aggressive, AI-assisted pace)**
+* **Source Control: Git (with a feature branching workflow).**  
+* **Estimated Timeline: 4 \- 6 months (aggressive, AI-assisted pace).**
 
-  ---
-
-**Git Workflow Strategy (Feature Branching Model) For a project with three distinct repositories (.NET Backend, Angular Frontend, React Frontend), a feature branching workflow is highly recommended. This allows independent development and testing of features before merging into stable branches.**
+**Git Workflow Strategy (Feature Branching Model): For a project with three distinct repositories (.NET Backend, Angular Frontend, React Frontend), a feature branching workflow is highly recommended. This allows independent development and testing of features before merging into stable branches.**
 
 **Repository Setup: Three separate Git repositories:**
 
@@ -48,25 +42,24 @@
 **Each repository will have at least the following long-lived branches:**
 
 * **`main` (or `master`): Represents the latest production-ready code. Only merged into via pull requests.**  
-* **`develop`: Integration branch for ongoing development. Features are merged here.**
-
-**Feature Branches: For each new feature, bug fix, or major refactor, create a new branch from `develop`. Naming convention: `feature/your-feature-name`, `bugfix/issue-description`, `refactor/area-name`.**
+* **`develop`: Integration branch for ongoing development. Features are merged here.**  
+* **Feature Branches: For each new feature, bug fix, or major refactor, create a new branch from `develop`. Naming convention: `feature/your-feature-name`, `bugfix/issue-description`, `refactor/area-name`.**
 
 **Development Cycle:**
 
-* **Pull `develop`: Always start by pulling the latest `develop` branch.**  
-* **Create Feature Branch: `git checkout -b feature/my-new-feature develop`**  
-* **Develop & Commit: Work on your feature. Make frequent, small, atomic commits with clear messages. `git add .`, `git commit -m "feat: implemented user registration form"`**  
-* **Push to Remote: Regularly push your feature branch to the remote: `git push origin feature/my-new-feature`**  
-* **Keep up with `develop`: Periodically pull `develop` into your feature branch to stay updated and resolve conflicts early: `git pull origin develop` (or `git pull origin develop --rebase` for a cleaner history if preferred).**
+1. **Pull develop: Always start by pulling the latest `develop` branch.**  
+2. **Create Feature Branch: `git checkout -b feature/my-new-feature develop`.**  
+3. **Develop & Commit: Work on your feature. Make frequent, small, atomic commits with clear messages. `git add .`, `git commit -m "feat: implemented user registration form"`.**  
+4. **Push to Remote: Regularly push your feature branch to the remote: `git push origin feature/my-new-feature`.**  
+5. **Keep up with develop: Periodically pull `develop` into your feature branch to stay updated and resolve conflicts early: `git pull origin develop` (or `git pull origin develop --rebase` for a cleaner history if preferred).**
 
 **Code Review & Merge (Pull Requests):**
 
-* **When a feature is complete and tested locally, push it to the remote.**  
-* **Create a Pull Request (PR) from your `feature/branch` to `develop` in your Git hosting platform (e.g., GitHub, GitLab, Azure DevOps).**  
-* **Mandatory Code Review: At least one other team member should review the code.**  
-* **Automated Checks: (Future CI/CD integration) PRs should trigger automated tests and static analysis.**  
-* **Merge: Once approved and all checks pass, merge the feature branch into `develop`. Use "Squash and Merge" or "Rebase and Merge" for a cleaner `develop` history, or "Merge Commit" for retaining all feature branch commits.**
+1. **When a feature is complete and tested locally, push it to the remote.**  
+2. **Create a Pull Request (PR) from your `feature/branch` to `develop` in your Git hosting platform (e.g., GitHub, GitLab, Azure DevOps).**  
+3. **Mandatory Code Review: At least one other team member should review the code.**  
+4. **Automated Checks: (Future CI/CD integration) PRs should trigger automated tests and static analysis.**  
+5. **Merge: Once approved and all checks pass, merge the feature branch into `develop`. Use "Squash and Merge" or "Rebase and Merge" for a cleaner develop history, or "Merge Commit" for retaining all feature branch commits.**
 
 **Releases (Optional but Recommended):**
 
@@ -86,115 +79,226 @@
 
   ---
 
-  #### **Phase 1: Core Foundation, Security & i18n Setup (Month 1 \- 1.5)**
+  ### **Phase 1: Core Foundation, Security & i18n Setup (Month 1 \- 1.5)**
 
-**Goal: Establish a secure, robust backend and foundational authentication/authorization. Set up the basic i18n/l10n framework across all layers and both frontends, using AI to accelerate initial setup.**
+**Goal: Establish a secure, robust backend and foundational authentication/authorization using OpenIddict and a BFF pattern for XSS hardening. Set up the basic i18n/l10n framework across all layers and both frontends, using AI to accelerate initial setup.**
 
-**1.1. Backend (.NET) & Database Setup**
-
-* **Action: Initial project setup with a Rich Domain Model design, emphasizing persistence-ignorance (POCOs without EF Core specific attributes/interfaces in the domain layer). Domain entities will encapsulate their own behavior, containing methods that represent business operations and enforce invariants. Define internal primary keys as `long` (mapping to BIGINT IDENTITY in SQL Server) and all foreign keys should also be `long`. Each entity (e.g., `User`, `Bug`, `Comment`) should also have a `Guid PublicId` property that is unique and will be exposed to the application layer. Include a `byte[] RowVersion` property on `User` for optimistic concurrency. Layered architecture, core DB schema (Users), EF Core configuration, JWT authentication/authorization, password hashing with BCrypt.Net-Next, server-side i18n. Crucially, generate and apply the initial Entity Framework Core database migration. All C\# code must fully leverage Nullable Reference Types (NRTs) to explicitly define nullability, ensuring properties and method return types reflect whether `null` is a valid state or value. Integrate Swagger/OpenAPI middleware for API documentation and interactive testing.**  
-* **Specifically for Identity: Customize `ApplicationUser` to inherit from `IdentityUser<long>` and add `FullName` (string, non-nullable) and `DateHired` (`DateTime?`, nullable) properties directly to it, along with the `Guid PublicId` property (non-nullable). For roles, directly use `ApplicationRole` inheriting from `IdentityRole<long>` and leverage ASP.NET Core Identity's built-in role management mechanisms.**  
-* **Role Seeding: Pre-seed the roles "user" and "admin" using `RoleManager<ApplicationRole>` in `Program.cs` (or a dedicated data seeding class) during application startup.**  
-* **Optimal Prompt(s):**  
-  * **"Provide the `dotnet` CLI commands to generate a .NET 9 solution named 'Uphbt'. Then, generate the following projects within this solution: 'Uphbt.Api' (a webapi project with controllers), 'Uphbt.Services' (a class library), 'Uphbt.Data' (a class library), and 'Uphbt.Domain' (a class library). After project creation, provide the `dotnet add reference` commands to set up the following project references: `Uphbt.Api` \-\> `Uphbt.Services`, `Uphbt.Api` \-\> `Uphbt.Data`, `Uphbt.Services` \-\> `Uphbt.Data`, `Uphbt.Services` \-\> `Uphbt.Domain`, `Uphbt.Data` \-\> `Uphbt.Domain`. Ensure the generated solution and projects are compatible with .NET 9."**  
-  * **"Generate a complete .NET 9 Web API solution structure (assuming previous `dotnet new` commands were executed) with the solution name 'Uphbt' for a layered architecture (Api, Services, Data, Domain) with Entity Framework Core 9 and SQL Server, using C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types). Design \*\*domain entities (e.g., `User`) as Plain C\# Objects (POCOs) in the Domain project, but ensure they are set up to be Rich Domain Models. This means properties should primarily use private setters where changes are driven by public business methods defined within the entity itself. Entities should include constructors to enforce valid initial states. They should ensure persistence-ignorance, without any EF Core attributes or base classes in the Domain project. All internal primary key Ids should be `long` (mapping to BIGINT IDENTITY in SQL Server) and all foreign keys should also be `long`. Each entity (e.g., `User`, `Bug`, `Comment`) should also have a `Guid PublicId` property that is unique and will be exposed to the application layer. Include a `byte[] RowVersion` property on `User` for optimistic concurrency. Provide `appsettings.json` for database connection, `Program.cs` setup, and a `DbContext` that maps these POCOs and configures `Id` as `IDENTITY`, adds a unique non-clustered index on `PublicId`, and sets `RowVersion` as a concurrency token using Fluent API in the Data project. Ensure all string properties are initialized to `string.Empty` or explicitly marked nullable (`string?`) where `null` is a valid state. Methods should return non-nullable types unless a `null` return is an expected outcome (e.g., for 'not found' scenarios). Include a `.gitignore` file suitable for a .NET project within the 'Uphbt' solution. Configure SwaggerGen and SwaggerUI in `Program.cs` for API documentation and testing. Then, provide the `dotnet ef migrations` commands to: (1) add the initial migration named 'InitialCreate', and (2) update the database to apply this migration."**  
-  * **"Extend the previous .NET 9 API within the 'Uphbt' solution to include JWT authentication and refresh token management using ASP.NET Core Identity customized to use `long` as the primary key type for `ApplicationUser` and `ApplicationRole`, using C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types). My `ApplicationUser` class should also be designed as a Rich Domain Model and have `FullName` (string, non-nullable), `DateHired` (DateTime?, nullable), and a `Guid PublicId` property (non-nullable). Provide `AuthController` with `/register`, `/login`, `/refresh-token` endpoints. Include DTOs for request/response. Ensure the service layer (e.g., AuthService) performs business logic that cannot be done on the `ApplicationUser` entity itself (e.g., password hashing via `BCrypt.Net-Next`, sending welcome emails, role assignment/checking). The `ApplicationUser` entity's own methods will handle its internal state changes (e.g., changing its own `FullName`). Ensure all DTO properties and service method return types correctly reflect their nullability using NRTs (e.g., `string`, `string?`, `AuthResponseDto?`). Ensure user registration generates and stores the `long` internal `Id` and the `Guid PublicId` and that login/update endpoints primarily interact with the `PublicId` from the client but translate to the internal `long` `Id` for database operations, passing `FullName` and `DateHired` as standard user properties. Implement password hashing using `BCrypt.Net-Next` and store refresh tokens in the database. Configure JWT bearer authentication in `Program.cs`. Ensure roles are included in JWT claims. Crucially, in `Program.cs` or a dedicated data seeding class, add logic to pre-seed the `admin` and `user` roles using `RoleManager<ApplicationRole>` if they do not already exist upon application startup. Show the minimal required custom `ApplicationUser`, `ApplicationRole`, and `ApplicationDbContext` setup for this Identity customization, and the role seeding logic. Ensure Swagger UI is configured to allow testing of authenticated endpoints (e.g., using a JWT Bearer token field)."**  
-  * **"Integrate `Microsoft.Extensions.Localization` into the Uphbt.Api project. Set up `RequestLocalizationMiddleware` to detect culture from `Accept-Language` header. Provide an example `Errors.en-US.resx` and `Errors.es.resx` for a localized validation message like 'Username is required'. Show how to inject `IStringLocalizer` into a controller and return a localized error. Ensure all string properties in generated classes and method parameters/return types correctly use NRT annotations. All C\# code should adhere to C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types)."**  
-* **Testing (AI-Assisted):**  
+* **1.1. Backend (.NET) & Database Setup**  
+  * **Action: Initial project setup with a Rich Domain Model design, emphasizing persistence-ignorance (POCOs without EF Core specific attributes/interfaces in the domain layer). Domain entities will encapsulate their own behavior, containing methods that represent business operations and enforce invariants. Define internal primary keys as `long` (mapping to `BIGINT IDENTITY` in SQL Server) and all foreign keys should also be `long`. Each entity (e.g., User, Bug, Comment) should also have a `Guid PublicId` property that is unique and will be exposed to the application layer. Include a `byte[] RowVersion` property on entities (starting with `User`) for optimistic concurrency. Layered architecture (Api, Services, Data, Domain), core DB schema (Users), EF Core configuration.**  
+  * **Authentication & Authorization (BFF Pattern for SPAs):**  
+    * **Integrate OpenIddict to act as the OAuth 2.0 Authorization Server and OpenID Connect Provider, issuing JWTs (Access and Refresh Tokens).**  
+    * **Configure OpenIddict for the Authorization Code Flow with PKCE for secure SPA authentication.**  
+    * **Enable and configure the Refresh Token Flow within OpenIddict.**  
+    * **Set short lifetimes for Access Tokens (e.g., 5-15 minutes) and longer, but finite, lifetimes for Refresh Tokens (e.g., 7-30 days).**  
+    * **Crucially, OpenIddict's setup will enable Refresh Token Rotation and Reuse Detection when `offline_access` scope is requested, which is vital for detecting and revoking stolen refresh tokens.**  
+    * **Implement Server-Side Token Management (BFF): After a user authenticates via OpenIddict, the .NET Backend will securely store the issued JWT Access and Refresh Tokens server-side (e.g., in a distributed cache like Redis, or a dedicated database table linked to a session).**  
+    * **Instead of sending the JWTs directly to the frontend for JavaScript storage, the backend will issue a secure, `HttpOnly`, `SameSite=Lax/Strict` session cookie to the frontend. This cookie will serve as the frontend's authentication credential.**  
+    * **For every incoming API request from the frontend (carrying the session cookie), the backend will:**  
+      * **Validate the session cookie.**  
+      * **Retrieve the corresponding JWT Access Token from its server-side store.**  
+      * **Use this JWT Access Token to authorize the request on the backend.**  
+      * **Handle silent refresh of the JWT Access Token using the stored Refresh Token, transparently to the frontend, renewing the session cookie if needed.**  
+      * **If the Refresh Token is reused or invalid, invalidate the session cookie and force re-login.**  
+    * **Client Configuration: Dynamically or statically register your Angular and React clients within OpenIddict's configuration/database, specifying `ClientId`, `RedirectUris`, `PostLogoutRedirectUris`, and allowed `GrantTypes`/`Scopes` (including `openid`, `profile`, `email`, `offline_access`).**  
+    * **Use BCrypt.Net-Next for secure password hashing within ASP.NET Core Identity.**  
+  * **I18n/L10n: Set up server-side internationalization using `Microsoft.Extensions.Localization`.**  
+  * **Middleware: Integrate Swagger/OpenAPI middleware for API documentation and interactive testing.**  
+  * **Code Quality: All C\# code must fully leverage Nullable Reference Types (NRTs) to explicitly define nullability, ensuring properties and method return types reflect whether null is a valid state or value.**  
+  * **Specific for Identity:**  
+    * **Customize `ApplicationUser` to inherit from `IdentityUser<long>` and add `FullName` (string, non-nullable) and `DateHired` (`DateTime?`, nullable) properties directly to it, along with the `Guid PublicId` property (non-nullable).**  
+    * **For roles, directly use `ApplicationRole` inheriting from `IdentityRole<long>` and leverage ASP.NET Core Identity's built-in role management mechanisms.**  
+    * **Role Seeding: Pre-seed the roles "user" and "admin" using `RoleManager<ApplicationRole>` in `Program.cs` (or a dedicated data seeding class) during application startup.**  
+  * **Initial Migrations: Generate and apply the initial Entity Framework Core database migration for Identity and core application entities.**  
   * **Optimal Prompt(s):**  
-    * **"Generate xUnit unit tests for the `AuthService` in a Uphbt.Services project. Mock `UserManager`, `SignInManager`, and `RefreshTokenRepository`. Cover scenarios for user registration (success, existing user, including `FullName` and `DateHired` data, and verifying correct role assignment upon registration like 'user' role by default), user login (success, invalid credentials), and refresh token validation (success, expired token). Verify `BCrypt.Net-Next` is used for hashing and validation and that user IDs are managed using the `long` internal ID for DB operations and `Guid PublicId` for API interactions. Also, verify `FullName` and `DateHired` are correctly stored and retrieved, and that role claims are present in generated JWTs. The tests should cover both domain logic (if any is simple and directly testable on `ApplicationUser` entity's methods) and service orchestration logic. Ensure all test code correctly handles `null` values for nullable types and assertions for non-nullable types, demonstrating an understanding of Nullable Reference Types. All test code should adhere to C\# 12 and modern syntax (e.g., file-scoped namespaces)."**  
-    * **"Create an integration test for the Uphbt.Api `AuthController` using `Microsoft.AspNetCore.Mvc.Testing`. Test the `/register` endpoint (success, validation failure, including `FullName` and `DateHired`, and verifying the default role is assigned), `/login` endpoint (success, invalid credentials). Add a test case for user update that involves optimistic concurrency: try to update the same user record twice simultaneously (or with a stale `RowVersion`) and assert that a `DbUpdateConcurrencyException` (or 409 Conflict) is returned. Ensure all API calls use the `Guid PublicId` for identification and correctly handle `FullName` and `DateHired` data and roles. Verify that DTOs and API responses correctly reflect nullability with NRTs. All test code should adhere to C\# 12 and modern syntax (e.g., file-scoped namespaces)."**  
-    * **"Write an integration test for the localized error messages in a Uphbt.Api. Send a request to a validation-protected endpoint with `Accept-Language: es` and `Accept-Language: en-US` headers, and assert that the returned error message matches the content in `Errors.es.resx` and `Errors.en-US.resx` respectively. Ensure all string properties and method returns in test setup and assertions correctly use NRT annotations. All test code should adhere to C\# 12 and modern syntax (e.g., file-scoped namespaces)."**
-
-**1.2. Frontend (Angular) Setup \- For Bug Tracker**
-
-* **Action: Angular project setup, routing, basic layout, core auth service/interceptor/guards, `ngx-translate` i18n setup, Angular Material and `ReactiveFormsModule` integration, and proxy configuration for API calls. Components should be designed to handle and send the `Guid PublicId` for all entities (Users, Bugs, Comments) and `RowVersion` for updates. User-related forms and displays will include `FullName` and `DateHired` (handling `DateHired` as potentially null). Role-based authorization will be handled using JWT claims (e.g., role: "admin").**  
-* **Optimal Prompt(s):**  
-  * **"Generate an Angular 19 application with a basic routing setup (e.g., /login, /bugs, /bugs/report). Include an `AuthService` for JWT handling, an `AuthInterceptor` to add bearer tokens, and an `AuthGuard` to protect routes. Show how to configure these in `app.module.ts` (or standalone equivalent). Integrate Angular Material and `ReactiveFormsModule` for form handling. Ensure services are designed to handle `Guid PublicId`s for all entities and `byte[]` `RowVersion` data types in their models. User models should include `FullName` (string) and `DateHired` (string | null, for display/input). Include a `.gitignore` file suitable for an Angular project."**  
-  * **"Create an Angular 19 `LoginComponent` and `RegisterComponent` using Angular Material form fields (e.g., `mat-form-field`, `mat-input`) and `ReactiveFormsModule`. Include validation for email, password, `FullName` and `DateHired` (as a `mat-datepicker` for `DateHired`, ensuring it handles `null` values correctly). Show how to integrate with `AuthService` for login/registration. Ensure all labels and error messages are translated using `ngx-translate`. The `AuthService` should expect the user's `PublicId` (Guid), `FullName`, `DateHired` (which might be `null`), and their assigned roles (e.g., an array of strings like \['user'\]) in the login/registration response."**  
-  * **"Integrate `ngx-translate/core` and `ngx-translate/http-loader` into an Angular 19 application. Show configuration in `app.module.ts`. Provide example `en.json` and `es.json` translation files for 'login.title', 'welcome.message', 'user.fullName', 'user.dateHired'. Show how to use `TranslatePipe` in a template and `TranslateService` for dynamic translation, and a simple language switcher component. Ensure the translation system correctly handles and displays `null` or undefined values for optional fields like `DateHired` gracefully."**  
-  * **"Generate an Angular CLI proxy configuration file (`proxy.conf.json`) to redirect all `/api` requests to a .NET 9 backend running on `http://localhost:5000` (or your backend port)."**  
-* **Testing (AI-Assisted):**  
+    * **"Provide the `dotnet CLI` commands to generate a .NET 9 solution named 'Uphbt'. Then, generate the following projects within this solution: 'Uphbt.Api' (a webapi project with controllers), 'Uphbt.Services' (a class library), 'Uphbt.Data' (a class library), and 'Uphbt.Domain' (a class library). After project creation, provide the `dotnet add reference` commands to set up the following project references: `Uphbt.Api` \-\> `Uphbt.Services`, `Uphbt.Api` \-\> `Uphbt.Data`, `Uphbt.Services` \-\> `Uphbt.Data`, `Uphbt.Services` \-\> `Uphbt.Domain`, `Uphbt.Data` \-\> `Uphbt.Domain`. Ensure the generated solution and projects are compatible with .NET 9 and fully utilize C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types)."**  
+    * **"Generate the `ApplicationDbContext` for a .NET 9 Web API using EF Core with SQL Server. This `DbContext` should integrate ASP.NET Core Identity with `ApplicationUser : IdentityUser<long>` and `ApplicationRole : IdentityRole<long>`, and also include an initial `Bug` entity with `long Id`, `Guid PublicId`, and `byte[] RowVersion`. Provide the necessary `Program.cs` EF Core configuration for SQL Server."**  
+    * **"Show me how to set up OpenIddict as an Authorization Server in a .NET 9 Web API using `Program.cs`. Configure it for Authorization Code Flow with PKCE, Refresh Token Flow, define client applications (e.g., for Angular and React SPAs with specific `ClientId` and `RedirectUris`), set short access token lifetimes and longer refresh token lifetimes, and integrate with ASP.NET Core Identity. Explain how OpenIddict's setup enables Refresh Token Rotation and Reuse Detection."**  
+    * **"Provide a C\# `LoginController` in a .NET 9 Web API that handles user authentication using `SignInManager<ApplicationUser>`, then stores the issued JWT Access and Refresh Tokens securely server-side, and issues a secure, `HttpOnly`, `SameSite` session cookie to the frontend. Include the setup for a secure logout endpoint that explicitly revokes the user's server-side managed tokens."**  
+    * **"How to implement `BCrypt.Net-Next` for password hashing within ASP.NET Core Identity in a .NET 9 application."**  
+    * **"Guide me on how to perform initial role seeding for 'user' and 'admin' roles using `RoleManager<ApplicationRole>` during application startup in `Program.cs`."**  
+    * **"Generate a basic example of server-side internationalization (i18n) setup in a .NET 9 Web API using `Microsoft.Extensions.Localization` for a `SharedResources.cs` file."**  
+* **1.2. Frontend 1 (Angular) \- Core Setup, Security & i18n Integration (`uphbt-angular-frontend`)**  
+  * **Action:**  
+    * **Initialize Angular v20 project using Angular CLI.**  
+    * **Integrate Angular Material UI library.**  
+    * **Authentication & Session Management (BFF Client):**  
+      * **Develop a robust `AuthService` to manage the authentication flow.**  
+      * **Implement the Authorization Code Flow with PKCE client-side: redirecting to the OpenIddict `/connect/authorize` endpoint (hosted by your .NET backend), handling the callback with the authorization code.**  
+      * **Crucially, the backend will handle the exchange of the authorization code for JWTs and then issue an `HttpOnly`, `SameSite` session cookie to the Angular app.**  
+      * **The Angular app will NOT directly read or store JWT Access/Refresh Tokens in JavaScript-accessible storage. All API calls will implicitly rely on the browser sending the `HttpOnly` session cookie.**  
+      * **Implement login (initiating the redirect flow), logout (clearing local session and calling backend's logout endpoint), and user session management (relying on the backend's session cookie).**  
+      * **The Angular app will not implement explicit token refresh logic as this is handled transparently by the backend's BFF layer.**  
+    * **HTTP Interceptor for API Calls:**  
+      * **Create an Angular HTTP Interceptor. Its primary role will be to detect `401 Unauthorized` responses from the API.**  
+      * **If a 401 occurs, it signifies that the backend session cookie is no longer valid (e.g., due to server-side JWT expiration/revocation). The interceptor will then redirect the user to the login page to re-initiate the authentication flow.**  
+      * **The interceptor will NOT attach JWTs as they are managed by the backend.**  
+    * **Routing & Guards: Implement Angular Router and create route guards to protect authenticated and authorized routes, checking for the presence/validity of the session (e.g., by making a lightweight API call to a `/me` endpoint that relies on the session cookie).**  
+    * **Forms: Utilize Angular's Reactive Forms for login, registration, and user profile forms, with comprehensive client-side validation using `Validators`.**  
+    * **I18n/L10n: Integrate `ngx-translate` for frontend internationalization, setting up translation files (JSON) and configuring the translation service.**  
+    * **Configure proxy for development server to handle API calls.**  
   * **Optimal Prompt(s):**  
-    * **"Write Jasmine/Karma unit tests for the Angular `AuthService`. Test methods like `login()`, `logout()`, `getToken()`, and `isAuthenticated()`. Ensure that `Guid` types (for `PublicId`), `FullName`, `DateHired` (including `null` scenarios), and roles are correctly handled in mock API responses."**  
-    * **"Generate Jasmine/Karma unit tests for the Angular `RegisterComponent`. Test ReactiveForm validation (including `FullName` and `DateHired` `null` handling), submission success/failure, and that Angular Material elements render correctly. Test that changing the language via `TranslateService.use()` updates the displayed text in the component's template. Verify that `FullName` and `DateHired` are correctly captured and sent in the registration payload, and that roles received in the response are correctly processed, paying attention to potential `null` values for `DateHired`."**
-
-**1.3. Frontend (React) Setup \- For Bug Tracker**
-
-* **Action: React project setup, routing, basic layout, `useAuth` hook/context, `axios` interceptors, `ProtectedRoute`, `i18next` i18n setup, React Hook Form and Material UI (MUI) integration, and proxy configuration for API calls. Components should be designed to handle and send the `Guid PublicId` for all entities and `RowVersion` for updates. User-related forms and displays will include `FullName` and `DateHired` (handling `DateHired` as potentially null). Role-based authorization will be handled using JWT claims (e.g., role: "admin").**  
-* **Optimal Prompt(s):**  
-  * **"Generate a React 19 application structure using Vite/CRA with `react-router-dom` for routing (/login, /bugs, /bugs/report). Include a `useAuth` hook/AuthContext for JWT handling, and configure `axios` interceptors to automatically add bearer tokens. Provide a basic `Login` component and `Register` component, and a `ProtectedRoute` component to guard routes. Integrate Material UI (MUI) for components and `react-hook-form` for form handling. Ensure data models used in hooks and components handle `Guid PublicId`s for all entities and `byte[]` `RowVersion` data types. User models should include `FullName` (string) and `DateHired` (string | null, for display/input, using MUI `DatePicker` that handles `null` correctly). Include a `.gitignore` file suitable for a React project."**  
-  * **"Create a React 19 `Login` functional component and `Register` functional component using MUI components (e.g., `TextField`, `Button`, `DatePicker`) and `react-hook-form` for form management. Implement validation for email, password, `FullName` and `DateHired` (ensuring the `DatePicker` component correctly binds and sends `null` when no date is selected). Show how to integrate with a `useAuth` hook for login/registration. Ensure all labels and error messages are translated using `useTranslation` from `react-i18next`. The `useAuth` hook should expect the user's `PublicId` (Guid), `FullName`, `DateHired` (which might be `null`), and their assigned roles (e.g., an array of strings like \['user'\]) in the login/registration response."**  
-  * **"Integrate `i18next` and `react-i18next` into a React 19 application. Configure `i18next` instance to load translations from `public/locales` using `i18next-http-backend`. Provide example `en/translation.json` and `es/translation.json` for 'login.title', 'welcome.message', 'user.fullName', 'user.dateHired'. Show how to use `useTranslation` hook in a functional component and implement a simple language switcher. Ensure the translation system correctly handles and displays `null` or undefined values for optional fields like `DateHired` gracefully."**  
-  * **"Generate a proxy configuration for a React application (either `setupProxy.js` for CRA or `vite.config.js` for Vite) to redirect all `/api` requests to a .NET 9 backend running on `http://localhost:5000` (or your backend port)."**  
-* **Testing (AI-Assisted):**  
+    * **"Guide me through setting up an Angular v20 project to implement the client-side of the Authorization Code Flow with PKCE for authentication, where the backend handles JWTs and issues an `HttpOnly` session cookie to the frontend for XSS protection. Show the redirect to the backend's authorization endpoint and handling the callback."**  
+    * **"Provide an Angular `AuthService` example that manages user login and logout by initiating redirects and clearing session state, without directly handling JWT Access or Refresh Tokens in JavaScript."**  
+    * **"Generate an Angular HTTP Interceptor that detects `401 Unauthorized` responses and redirects the user to the login page, as the backend is managing tokens via an `HttpOnly` session cookie. Explain why explicit JWT attachment is not needed here."**  
+    * **"How to implement Angular Route Guards to protect routes, by checking the user's authentication status based on a session cookie (e.g., by calling a backend `/me` endpoint)."**  
+    * **"How to integrate `ngx-translate` into an Angular v20 project, including setting up translation files and using the `translate` pipe/service."**  
+    * **"Show an Angular Reactive Form for user login with client-side validation and Angular Material components."**  
+* **1.3. Frontend 2 (React) \- Core Setup, Security & i18n Integration (`uphbt-react-frontend`)**  
+  * **Action:**  
+    * **Initialize React v19 project.**  
+    * **Integrate Material-UI (MUI v6) library.**  
+    * **Authentication & Session Management (BFF Client):**  
+      * **Develop a React Context (`AuthContext`) and a custom hook (`useAuth`) to manage authentication state and provide authentication functionalities across the application.**  
+      * **Implement the Authorization Code Flow with PKCE client-side: redirecting to the OpenIddict `/connect/authorize` endpoint (hosted by your .NET backend), handling the callback with the authorization code.**  
+      * **Crucially, the backend will handle the exchange of the authorization code for JWTs and then issue an `HttpOnly`, `SameSite` session cookie to the React app.**  
+      * **The React app will NOT directly read or store JWT Access/Refresh Tokens in JavaScript-accessible storage. All API calls will implicitly rely on the browser sending the `HttpOnly` session cookie.**  
+      * **Implement login (initiating the redirect flow), logout (clearing local session and calling backend's logout endpoint), and user session management (relying on the backend's session cookie).**  
+      * **The React app will not implement explicit token refresh logic as this is handled transparently by the backend's BFF layer.**  
+    * **Axios Interceptor for API Calls:**  
+      * **Configure Axios (or a custom `fetch` wrapper) to use an Interceptor. Its primary role will be to detect `401 Unauthorized` responses from the API.**  
+      * **If a 401 occurs, it signifies that the backend session cookie is no longer valid. The interceptor will then redirect the user to the login page to re-initiate the authentication flow.**  
+      * **The interceptor will NOT attach JWTs as they are managed by the backend.**  
+    * **Routing & Guards: Implement React Router for client-side navigation and create private route components to protect authenticated and authorized routes, checking for the presence/validity of the session.**  
+    * **Forms: Utilize React Hook Form for robust login, registration, and user profile forms, integrating with MUI components and using schema validation (e.g., Zod, Yup).**  
+    * **I18n/L10n: Integrate `i18next` and `react-i18next` for frontend internationalization, setting up translation files (JSON) and configuring the translation service.**  
+    * **Configure proxy for development server to handle API calls.**  
   * **Optimal Prompt(s):**  
-    * **"Write Jest/React Testing Library unit tests for the React `useAuth` hook. Test state changes for login/logout, token storage/retrieval, and `isAuthenticated` status. Ensure that `Guid` types (for `PublicId`), `FullName`, `DateHired` (including `null` scenarios), and roles are correctly handled in mock API responses."**  
-    * **"Generate Jest/React Testing Library tests for the React `Register` component. Test form validation (including `FullName` and `DateHired` `null` handling with `MUI DatePicker` interaction), submission success/failure, and that MUI components render correctly. Test that changing the language (by mocking `i18n.changeLanguage`) updates the displayed text in the component's template. Verify that `FullName` and `DateHired` are correctly captured and sent in the registration payload, and that roles received in the response are correctly processed, paying attention to potential `null` values for `DateHired`."**
+    * **"Guide me through setting up a React v19 project to implement the client-side of the Authorization Code Flow with PKCE for authentication, where the backend handles JWTs and issues an `HttpOnly` session cookie to the frontend for XSS protection. Show the redirect to the backend's authorization endpoint and handling the callback."**  
+    * **"Provide a React `AuthContext` and `useAuth` hook example that manages user login and logout by initiating redirects and clearing session state, without directly handling JWT Access or Refresh Tokens in JavaScript."**  
+    * **"Generate an Axios Interceptor (or `fetch` wrapper) in React that detects `401 Unauthorized` responses and redirects the user to the login page, as the backend is managing tokens via an `HttpOnly` session cookie. Explain why explicit JWT attachment is not needed here."**  
+    * **"How to implement private routes in React Router that check the user's authentication status based on a session cookie (e.g., by calling a backend `/me` endpoint)."**  
+    * **"How to integrate `i18next` and `react-i18next` into a React v19 project, including setting up translation files and using `useTranslation`."**  
+    * **"Show a React Hook Form example for user login with client-side validation using Zod and MUI components."**
 
     ---
 
-    #### **Phase 2: Bug Tracker Core Functionality & i18n Integration (Months 1.5 \- 4\)**
+    ### **Phase 2: Feature Development & Real-Time Functionality**
 
-**Goal: Implement full CRUD operations, file attachments, commenting, and real-time updates for bugs, with comprehensive testing and full i18n/l10n integration. Leverage AI heavily for feature generation and cross-framework mirroring.**
+**Goal: Implement the core business logic for Bug and Comment management, including real-time updates.**
 
-**2.1. Backend (.NET) \- Bug & Comment Management \+ Real-time (API)**
-
-* **Action: Define `Bug`, `BugAttachment`, `Comment` entities as Rich Domain Models in the domain layer. This means they will encapsulate their own internal business rules (e.g., a `Bug` knows how to change its `Status`, a `Comment` knows how to `EditContent`). All internal primary keys and foreign keys should be `long` (`BIGINT`). Each entity should also have a `Guid PublicId`. Include a `byte[] RowVersion` property for optimistic concurrency. Implement CRUD endpoints where the service layer orchestrates calls to these rich domain entities' methods and handles logic that cannot be performed by the entity itself (e.g., authorization, external notifications, cross-aggregate consistency). These services will accept `Guid PublicId`s and validate `RowVersion` on update/delete operations. Support file upload/download, generic commenting, SignalR Hub. Crucially, all joins and foreign key relationships in the database queries will be performed on the internal `long` keys. All C\# code must fully leverage Nullable Reference Types (NRTs) to explicitly define nullability, ensuring properties and method return types reflect whether `null` is a valid state or value.**  
-* **Optimal Prompt(s):**  
-  * **"Generate a complete .NET 9 Web API CRUD for a `Bug` entity (`Id`: `long` (PK, Clustered Index), `PublicId`: `Guid` (Unique, Non-Clustered), `ProjectId`: `long` (FK), Title (string, non-nullable), Description (string?, nullable), Severity(Enum: Low, Medium, High), Status(Enum: Open, InProgress, Closed), AssignedToUserId: `long` (FK, nullable), ReportedByUserId: `long` (FK, non-nullable), ReportedDate, LastUpdatedDate, `byte[] RowVersion`). Define `Bug` as a Rich Domain Model in the Domain layer, meaning it will have private setters for its properties and public methods (e.g., `AssignTo(User assignee)`, `Resolve()`, `Reopen()`) to encapsulate its own business logic and state transitions. The service layer will orchestrate operations, retrieving the `Bug` and `User` entities, calling the `Bug`'s methods, and handling any logic that doesn't fit within the `Bug` entity itself (e.g., user role checks, sending notifications, complex querying). Include DTOs, controller, service. Ensure all string properties are initialized to `string.Empty` or explicitly marked nullable (`string?`) where `null` is a valid state. Methods should return non-nullable types unless a `null` return is an expected outcome (e.g., for 'not found' scenarios). Ensure update and delete operations in the service/repository use the provided `RowVersion` for optimistic concurrency checks. All API endpoints should accept `PublicId` for identification. Backend services should translate the `PublicId` to `Id` for database queries and all foreign key relationships (`ProjectId`, `AssignedToUserId`, `ReportedByUserId`) should be handled using `long` type internally. Support file attachments (upload and download) using `IFormFile` to a local directory or Azure Blob Storage. Provide the API structure for file upload and download. Ensure Swagger documentation for the `Bug` endpoints correctly reflects the usage of `Guid PublicId` and `RowVersion`, and explicitly states parameter requirements and response types. All generated C\# code should use C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types)."**  
-  * **"Extend the .NET 9 API with a generic `Comment` entity (`Id`: `long` (PK, Clustered Index), `PublicId`: `Guid` (Unique, Non-Clustered), `BugId`: `long` (FK), Content (string, non-nullable), CreatedByUserId: `long` (FK, non-nullable), CreatedDate, `byte[] RowVersion`). Define `Comment` as a Rich Domain Model in the Domain layer, allowing it to encapsulate its own logic (e.g., `EditContent(string newContent)`). Provide endpoints for `GET /api/bugs/{bugPublicId}/comments` and `POST /api/bugs/{bugPublicId}/comments`, and `PUT`/`DELETE` for comments, ensuring `RowVersion` handling for updates/deletes and that all foreign keys (`BugId`, `CreatedByUserId`) are handled using `long` type internally. The service layer will orchestrate comment operations, calling methods on the `Comment` entity and handling cross-cutting concerns (e.g., `SignalR` notifications). Include DTOs and services. Ensure `BugId` is validated against existing bugs. Ensure all DTO properties and service method return types correctly reflect their nullability using NRTs. Ensure Swagger documentation for `Comment` endpoints clearly indicates the `PublicId` and `RowVersion` parameters where applicable. All generated C\# code should use C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types)."**  
-  * **"Integrate SignalR into the Uphbt.Api project. Create a `BugHub` that allows clients to subscribe to specific `BugPublicId`s or `ProjectPublicId`s. Show how to broadcast messages (e.g., 'new\_comment\_added', 'bug\_status\_changed') to all clients connected to a bug/project whenever a new comment is added or a bug status changes. Ensure messages sent from the hub are localized using `IStringLocalizer` based on the recipient's stored preference or a default. This real-time notification is a cross-cutting concern handled by the service layer, separate from the domain entity's core logic, which only updates the entity's state. Ensure all method parameters and return types in the hub correctly use NRT annotations. All generated C\# code should use C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types)."**  
-* **Testing (AI-Assisted):**  
+* **2.1. Backend: Bug & Comment Management API (`uphbt-backend`)**  
+  * **Action:**  
+    * **Rich Domain Model Implementation: Implement `Bug` and `Comment` as rich domain entities with encapsulated business logic. Entities will have methods that represent business operations (`Bug.AssignUser()`, `Bug.ChangeStatus()`, `Bug.AddComment()`) and enforce their own invariants.**  
+    * **Define Value Objects (e.g., `BugStatus`, `Severity`, `Priority`) as immutable types where appropriate.**  
+    * **Ensure `Bug` and `Comment` entities also include `Guid PublicId` and `byte[] RowVersion` properties for API exposure and optimistic concurrency, respectively.**  
+    * **Repository Pattern Implementation: Create dedicated EF Core repositories (`IBugRepository`, `ICommentRepository`) for data persistence, returning domain entities.**  
+    * **Service Layer Implementation: Develop application services (`BugService`, `CommentService`) to orchestrate domain operations, handle transactions, and interact with repositories. Services will be lean, delegating complex logic to the rich domain model.**  
+    * **DTOs: Implement Data Transfer Objects (DTOs) for API requests and responses, with clear mapping between DTOs and domain entities.**  
+    * **API Endpoints for CRUD: Create comprehensive RESTful API endpoints for:**  
+      * **Creating, reading (list with filtering/sorting/pagination, by `PublicId`), updating, and deleting Bugs.**  
+      * **Adding, reading (by Bug `PublicId`), updating, and deleting Comments.**  
+    * **Authorization: Apply robust authorization attributes (`[Authorize]`, `[Authorize(Roles="Admin")]`, or custom policy-based authorization based on `ApplicationUser` claims/roles derived from the server-side managed JWT) to all relevant endpoints to ensure only authorized users can perform actions.**  
+    * **Real-time Communication with SignalR:**  
+      * **Implement ASP.NET Core SignalR Hubs (e.g., `BugHub`, `CommentHub`) for real-time updates.**  
+      * **Secure SignalR Hubs using cookie-based authentication (as the frontend will send the `HttpOnly` session cookie), or by allowing the frontend to send a *separate, short-lived, non-HttpOnly JWT* for SignalR connection if needed (less ideal for full XSS hardening, but an option if cookie-based SignalR auth is tricky). The primary goal is to ensure only authenticated users with valid sessions can connect and receive updates.**  
+      * **Send real-time notifications to connected clients upon relevant CRUD operations (e.g., "new bug created," "comment added to bug," "bug status changed").**  
   * **Optimal Prompt(s):**  
-    * **"Generate xUnit unit tests for `BugService` in the Uphbt.Services project (CRUD, validation, file upload logic, comment service logic). Mock `IFileStorageService` and `IBugHubContext` (for SignalR). Ensure tests operate on rich domain models by calling their behavior methods and verifying their internal state changes, rather than directly manipulating properties. Crucially, write tests for optimistic concurrency failures for `Bug` and `Comment` updates/deletes, asserting that the correct exceptions/error responses are returned when `RowVersion` is stale. Verify that API calls use `Guid PublicId` for identification, and internal service logic correctly translates to and from `long` internal IDs for database interactions. All test code should correctly handle `null` values for nullable types and assert on non-nullable types, demonstrating an understanding of Nullable Reference Types. All test code should adhere to C\# 12 and modern syntax (e.g., file-scoped namespaces)."**  
-    * **"Create integration tests for the .NET 9 Uphbt.Api `BugController` and `CommentController`. Test file upload/download. Test comment submission to bugs. Test SignalR hub integration: connect a test client, invoke a method, and assert message is broadcast with correct localized content. Include integration tests that verify optimistic concurrency for bug and comment updates/delates (e.g., two concurrent update attempts, one fails). Ensure all requests use `Guid PublicId` and responses return `Guid PublicId` for all entities, and that user-related fields (`FullName`, `DateHired` \- handling `null` for `DateHired`) are correctly displayed in relevant DTOs/responses. All test code should correctly handle `null` values for nullable types and assert on non-nullable types. All test code should adhere to C\# 12 and modern syntax (e.g., file-scoped namespaces)."**
-
-**2.2. Frontend (Angular) \- Bug Tracker Features (Full Implementation)**
-
-* **Action: Implement UI for bug reporting/tracking, file attachments, commenting, real-time updates using Angular Material and `ReactiveFormsModule`. All forms for updating entities must include and send the `Guid PublicId` and the `RowVersion` from the last fetched state. Implement logic to detect and inform the user about concurrency conflicts (stale data). User-related displays (e.g., assignee/reporter) will show `FullName` (handling `DateHired` as potentially null). Implement role-based UI elements (e.g., hide/show buttons based on user roles like 'admin').**  
-* **Optimal Prompt(s):**  
-  * **"Generate an Angular 19 component for a `BugListComponent` that fetches bugs from `/api/bugs` (receiving `Guid PublicId`s and `RowVersion`), displays them in an Angular Material table (`mat-table`), and allows viewing details, editing, and deleting. Include search and filter by status/severity/assignee (displaying `FullName` for assignees/reporters, but sending their `PublicId` for filtering), sorting, and pagination. Ensure all labels and messages are translated using `ngx-translate`. Show how to conditionally render an 'Edit' or 'Delete' button based on the logged-in user's role (e.g., only 'admin' or 'project\_manager' roles can see them). Ensure all data structures handle `null` values correctly where applicable (e.g., for optional descriptions, `DateHired`)."**  
-  * **"Create an Angular 19 component for `BugReportFormComponent` (for new bugs) and `BugEditFormComponent` (for existing bugs) using Angular Material form fields (`mat-form-field`, `mat-input`, `mat-select`) and `ReactiveFormsModule`. The `BugEditFormComponent` must fetch the bug details (including its `PublicId` and `RowVersion`). When submitting updates, the stored `PublicId` and `RowVersion` must be included in the payload. Implement error handling to detect 409 Conflict responses (concurrency errors) and display a user-friendly message, prompting the user to refresh and re-apply changes if desired. All text must be translated with `ngx-translate`. Ensure user selection for `AssignedTo` and `ReportedBy` fields displays `FullName` but internally uses `Guid PublicId` for data binding and API calls. Also, show how to disable/enable certain form fields based on the user's role. Ensure all form controls correctly handle `null` or empty values for optional fields like `Description` or `DateHired`."**  
-  * **"Generate an Angular 19 component for `BugDetailComponent`. Display bug details using Angular Material cards/layout, a list of comments, and attachments with download links. When viewing, store the bug's `PublicId` and `RowVersion`. Allow adding new comments using a ReactiveForm; if comments have `PublicId` and `RowVersion`, handle those too. Integrate SignalR client to receive real-time updates for new comments. Ensure all text and messages are translated. Display `FullName` for bug assignees, reporters, and comment creators. Show how to conditionally display 'Delete Comment' button only for 'admin' users or the comment creator. Ensure all displayed data (e.g., bug description, assignee, DateHired) correctly handles `null` or undefined values."**  
-* **Testing (AI-Assisted):**  
+    * **"Design a rich domain model for a 'Bug' entity in C\# for a .NET 9 application. Include `long Id`, `Guid PublicId`, `byte[] RowVersion`, `Title`, `Description`, `Severity`, `Status` (Value Object), `AssignedToUserId`, `ReportedByUserId`. Include methods like `ChangeStatus(newStatus)`, `AssignTo(userId)`, `AddComment(comment)`. Ensure it enforces invariants."**  
+    * **"How to implement an `IBugRepository` interface and its EF Core implementation (`BugRepository`) in .NET 9, including methods for optimistic concurrency (`RowVersion`) and retrieving entities by `PublicId`?"**  
+    * **"Provide a `BugService` example in .NET 9 that uses the `IBugRepository`, orchestrates operations on the `Bug` domain entity, and handles DTO mapping."**  
+    * **"Generate RESTful API endpoints in a .NET 9 Web API for CRUD operations on 'Bug' entities (using their `PublicId`s), including `[Authorize]` attributes (e.g., allowing only authenticated users to create, and 'Admin' role to delete), and demonstrate handling optimistic concurrency conflicts with `RowVersion`."**  
+    * **"Guide me through securing an ASP.NET Core SignalR Hub using cookie-based authentication in .NET 9, ensuring users are authenticated via the `HttpOnly` session cookie before connecting."**  
+    * **"Show how to broadcast real-time updates from a SignalR Hub (`BugHub`) to connected clients (e.g., when a bug's status changes or a new comment is added) from a service layer."**  
+* **2.2. Frontend: Bug & Comment Management UI (Angular & React)**  
+  * **Action:**  
+    * **Core UI Components: Develop comprehensive UI components for:**  
+      * **Bug listing (including filtering, sorting, and pagination).**  
+      * **Bug detail view, displaying all relevant properties and associated comments.**  
+      * **Bug creation and editing forms.**  
+      * **Components for displaying existing comments and adding new comments to a bug.**  
+    * **Utilize Angular Material / MUI for a consistent, accessible, and professional user interface.**  
+    * **API Integration: Integrate with the backend API endpoints for all CRUD operations. Ensure all requests implicitly send the `HttpOnly` session cookie via the browser. Implement robust error handling and provide clear user feedback for API calls.**  
+    * **Real-time Updates with SignalR:**  
+      * **Implement SignalR client-side integration in both Angular and React applications.**  
+      * **Connect to the backend SignalR Hubs, relying on the browser to send the `HttpOnly` session cookie for authentication.**  
+      * **Subscribe to relevant real-time events (e.g., `bugAdded`, `bugUpdated`, `commentAdded`).**  
+      * **Dynamically update the UI in real-time based on incoming notifications (e.g., new bugs appearing instantly, comments showing up without page refresh, bug status updates).**  
   * **Optimal Prompt(s):**  
-    * **"Generate Jasmine/Karma unit tests for the Angular `BugListComponent`. Test rendering with mock data (including `Guid PublicId`s and `RowVersion`, and user `FullName`), search/filter/sort functionality, pagination, and correct translation of UI elements, specifically verifying Angular Material table interactions. Ensure filtering by user `PublicId` displays `FullName` correctly. Add tests to verify conditional rendering of 'Edit'/'Delete' buttons based on user roles."**  
-    * **"Create Jasmine/Karma unit tests for the Angular `BugReportFormComponent` and `BugEditFormComponent`. Test ReactiveForm validation (including `RowVersion` presence for updates). Crucially, test the component's handling of 409 Conflict responses, verifying that it displays the correct user message and allows for refresh/retry. Test integration with `FullName` display for user selection. Verify that `Guid PublicId` and `RowVersion` are correctly sent in update payloads and that conditional field enabling/disabling based on roles works as expected."**  
-    * **"Write Jasmine/Karma unit tests for the Angular `BugDetailComponent`. Test display of bug details, comments, and attachments. Test the comment ReactiveForm submission. Verify SignalR client integration, asserting that the component correctly processes real-time updates (e.g., new comment added). Ensure conditional display of 'Delete Comment' button based on user roles."**
+    * **"Generate an Angular component for a paginated, sortable, and filterable bug list using Angular Material `mat-table`. Include an example of how to fetch data from the API and handle loading states."**  
+    * **"Create a React component for a bug detail page that fetches bug data by `PublicId`, displays associated comments, and includes a form to add new comments, using MUI and React Hook Form. Demonstrate optimistic UI updates."**  
+    * **"How to integrate the SignalR client into an Angular application, ensuring the client connects to a secure Hub by relying on the browser to send the `HttpOnly` session cookie for authentication, and subscribes to real-time bug updates."**  
+    * **"Show me how to connect to a SignalR Hub in a React application using a custom hook, relying on the browser to send the `HttpOnly` session cookie for authentication, and display real-time comments for a specific bug using `useState`."**  
+    * **"Provide an example of an Angular service method that calls a PUT API endpoint for updating a bug, handles `RowVersion` for optimistic concurrency, and provides user feedback."**
 
     ---
 
-    #### **Phase 3: Advanced Features, Performance, Monitoring & Deployment (Months 4 \- 6\)**
+    ### **Phase 3: Enhancements, Testing & Deployment**
 
-**Goal: Implement remaining complex features, optimize for performance, establish robust monitoring, and automate deployment processes to prepare for production.**
+**Goal: Refine the application with additional features, ensure quality through comprehensive testing, and prepare for deployment.**
 
-**3.1. Advanced Backend Features (API)**
+* **3.1. Backend: Enhancements & Best Practices (`uphbt-backend`)**  
+  * **Action:**  
+    * **Logging & Monitoring with Serilog: Integrate Serilog for structured logging across the application. Configure Serilog to write to console, file, and potentially a centralized logging sink (e.g., Seq, Elasticsearch). Implement dependency injection for `ILogger` throughout services and controllers, ensuring logging includes contextual information like authenticated user ID.**  
+    * **Centralized Exception Handling: Implement a global exception handling middleware to catch unhandled exceptions, log them with Serilog, and return consistent, standardized `ProblemDetails` (RFC 7807\) responses to the client.**  
+    * **Robust Input Validation: Implement comprehensive input validation for all incoming API requests using FluentValidation (recommended) or Data Annotations. Ensure validation failures return standardized `ProblemDetails` responses with clear error details.**  
+    * **Performance Optimizations: Utilize asynchronous programming (`async/await`) consistently throughout the call stack. Implement basic caching strategies (e.g., in-memory caching for frequently accessed, less volatile data like static lookup lists or user profiles) where appropriate.**  
+    * **Advanced Authorization (Policy-Based Authorization): Implement custom policy-based authorization handlers (e.g., a policy like "CanEditBug" that checks if the current user is the bug reporter, an assigned user, or an 'Admin'). Apply these policies using `[Authorize(Policy="MyCustomPolicy")]` on controllers or actions.**  
+    * **I18n/L10n: Refine server-side internationalization, ensuring error messages, validation messages, and API responses can be localized.**  
+  * **Optimal Prompt(s):**  
+    * **"How to integrate Serilog into a .NET 9 Web API for structured logging, including logging contextual information like the authenticated user's `PublicId` (derived from the server-side managed JWT) and using different log sinks?"**  
+    * **"Provide a C\# example of a global exception handling middleware that catches exceptions and maps them to RFC 7807 `ProblemDetails` responses in a .NET 9 Web API."**  
+    * **"Show me how to use FluentValidation to define and apply validation rules for a DTO in a .NET 9 Web API, ensuring validation failures are returned as `ProblemDetails`."**  
+    * **"Guide me through creating a custom authorization policy in ASP.NET Core (.NET 9\) that verifies if the authenticated user (identified by `PublicId` from the server-side managed JWT) has permission to edit a specific bug (e.g., if they are the reporter or an admin)."**  
+* **3.2. Frontend: Enhancements (Angular & React)**  
+  * **Action:**  
+    * **Advanced UI/UX & User Feedback: Implement more sophisticated UI/UX elements, including global loading indicators, toast notifications for success/error messages (e.g., using Angular Material SnackBar or MUI Snackbar), and more detailed form feedback.**  
+    * **Implement advanced filtering, sorting, and pagination for data grids (e.g., on the bug list), handling state changes efficiently.**  
+    * **State Management Refinement:**  
+      * **(Angular): If the application state becomes complex, consider dedicated state management libraries like NgRx (for reactive state management) or Akita (for a more opinionated, simpler approach), understanding their patterns and trade-offs.**  
+      * **(React): If global state management needs escalate beyond Context API/hooks, explore Zustand (lightweight and flexible) or Redux Toolkit (opinionated and powerful) for managing application-wide state.**  
+    * **Client-Side Routing Guards (Refinement): Ensure routing guards comprehensively handle not only authenticated vs. unauthenticated states but also authorization based on user roles/claims (e.g., `CanActivate` based on user's `ApplicationRole` or specific permissions from the backend's session validation), integrating with the `AuthService` or `useAuth` hook.**  
+    * **I18n/L10n: Implement advanced internationalization features (e.g., language switching, pluralization, date/time formatting) in both Angular (`ngx-translate`) and React (`i18next`).**  
+  * **Optimal Prompt(s):**  
+    * **"How to implement a global HTTP interceptor in Angular that shows a loading spinner during API calls and displays toast notifications for success/error messages using Angular Material SnackBar."**  
+    * **"Show me how to create a custom hook in React using Zustand to manage global application state (e.g., user profile, application settings)."**  
+    * **"Provide an Angular Router Guard example that uses the `AuthService` to check if a user has a specific role (validated by the backend session) before allowing access to a route."**  
+    * **"How to implement a `PrivateRoute` component in React Router that checks for user authentication and specific roles/permissions (derived from the backend session) using the `useAuth` hook."**  
+    * **"Guide me on how to implement language switching and dynamic content translation using `ngx-translate` in Angular, including lazy-loading translation files."**  
+* **3.3. Testing**  
+  * **Action:**  
+    * **Backend Unit & Integration Testing (.NET):**  
+      * **Write comprehensive unit tests for Rich Domain Entities (ensuring invariants), Value Objects, Services, and Repositories using xUnit and Moq.**  
+      * **Implement integration tests for API controllers using `Microsoft.AspNetCore.Mvc.Testing` (`WebApplicationFactory`), verifying endpoint behavior, data persistence, and especially the security flows with OpenIddict and the BFF pattern:**  
+        * **Successful user registration, login, and server-side JWT issuance and session cookie creation.**  
+        * **Accessing protected resources with valid and invalid/expired session cookies.**  
+        * **Verification of server-side JWT refresh token rotation and acquisition of new JWTs transparently to the frontend.**  
+        * **Crucially, test the detection of refresh token reuse (simulating a stolen token attempt on the backend) and verification of proper full session invalidation (all tokens in the chain revoked, session cookie invalidated).**  
+        * **Logout functionality correctly revokes server-side managed tokens and invalidates the session cookie.**  
+        * **Test authorization policies (role-based, custom policies).**  
+    * **Frontend Unit Testing (Angular & React):**  
+      * **Write unit tests for Angular components, services, pipes, and directives using Jasmine/Karma/Angular Testing Bed, and `HttpClientTestingModule` for API mocks.**  
+      * **Write unit tests for React components, hooks, and utility functions using Jest and React Testing Library, utilizing MSW (Mock Service Worker) for API mocking.**  
+    * **End-to-End Testing (Cypress or Playwright):**  
+      * **Implement robust E2E tests for core user flows across the full stack (user registration, login, CRUD operations for Bugs/Comments, real-time updates).**  
+      * **Crucially, implement E2E tests that simulate session expiration (by manipulating time or forcing backend expiration) and verify the automatic server-side JWT refresh flow transparently to the client (i.e., the client continues to make requests successfully without re-login).**  
+      * **Implement E2E test scenarios to simulate refresh token theft and reuse (by directly interacting with backend APIs or manipulating cookies if possible) and verify that the application correctly forces a re-login or completely invalidates the session.**  
+      * **Verify protected route access and redirection logic.**  
+      * **Test real-time updates through SignalR.**  
+  * **Optimal Prompt(s):**  
+    * **"How to write unit tests for a C\# Rich Domain Model entity's invariants and behavior methods (e.g., `Bug.ChangeStatus()`) using xUnit and Moq?"**  
+    * **"Provide an integration test example for a .NET 9 Web API login endpoint that uses `WebApplicationFactory` and `TestServer` to verify successful server-side JWT issuance and `HttpOnly` session cookie creation."**  
+    * **"Show me how to write an integration test for a .NET 9 API that specifically verifies server-side refresh token rotation and reuse detection with OpenIddict, simulating a stolen token attempt and asserting full session invalidation."**  
+    * **"Generate an E2E test script using Playwright (or Cypress) that simulates user login, performs actions, and then verifies that the server-side JWT refresh mechanism keeps the session alive transparently to the client (without the client handling JWTs directly)."**  
+    * **"How to write an E2E test (with Playwright or Cypress) to simulate a stolen refresh token attempt (e.g., by directly calling the backend's token endpoint with a compromised refresh token) and assert that the application properly invalidates the user's session and forces a re-login."**  
+    * **"Provide an Angular unit test example for an `AuthService` covering login and logout logic in a BFF pattern context."**  
+    * **"Show me a React unit test for a `useAuth` hook covering session management and logout in a BFF pattern context, mocking API calls with MSW."**  
+* **3.4. Deployment & CI/CD**  
+  * **Action:**  
+    * **Dockerization: Create optimized Dockerfiles for the .NET API and both frontend applications. Utilize multi-stage builds to create lightweight, secure, and production-ready images. Containerize SQL Server for a local development environment if desired (e.g., via Docker Compose for easy setup).**  
+    * **GitHub Actions CI/CD: Set up comprehensive GitHub Actions workflows for:**  
+      * **Continuous Integration (CI): Automate build, test (unit, integration, E2E), linting, and static code analysis/security scanning processes upon code pushes to feature branches and pull requests.**  
+      * **Continuous Deployment (CD): Automate the deployment of built Docker images to a container registry (e.g., Docker Hub, GitHub Container Registry) upon successful CI builds on the `main` or `develop` branch.**  
+      * **Orchestrated Deployment: For the full application, implement a `docker-compose.yml` that orchestrates the backend and frontend containers for local development and potential single-server deployment.**  
+      * **Cross-Origin Cookie Handling: Ensure deployment environment (e.g., reverse proxy like Nginx/Caddy) is configured to correctly handle `SameSite` cookies and proxy requests to the backend, especially if frontend and backend are on different subdomains.**  
+      * **HTTPS Enforcement: Ensure HTTPS is enforced for all communication.**  
+      * **(Optional but highly recommended for upskilling): Extend CD to automatically deploy the containerized applications to a cloud provider (e.g., Azure App Services/AKS, AWS EC2/ECS/EKS, DigitalOcean Droplet/Kubernetes) for a complete end-to-end pipeline.**  
+  * **Optimal Prompt(s):**  
+    * **"Generate a production-ready Dockerfile for a .NET 9 Web API application using multi-stage builds, including best practices for security and performance optimization, and explaining how to handle server-side session state for the BFF pattern."**  
+    * **"Provide Dockerfiles for an Angular v20 application and a React v19 application using multi-stage builds for production deployments, optimizing for image size."**  
+    * **"Show me a `docker-compose.yml` file that orchestrates a .NET 9 Web API (connecting to SQL Server via Docker), an Angular v20 frontend, and a React v19 frontend for a local development environment, ensuring proper network configuration for `HttpOnly` cookies."**  
+    * **"How to set up a GitHub Actions workflow that orchestrates building a .NET 9 API, an Angular app, and a React app, running their tests, then building and pushing their Docker images to GitHub Container Registry."**  
+    * **"Guide me on creating a GitHub Actions workflow to automatically deploy Docker containers from GitHub Container Registry to Azure App Services for a .NET 9 API and a single SPA frontend, considering the BFF pattern and `HttpOnly` cookies."**
 
-* **Action: Implement background processing for long-running or asynchronous tasks (e.g., complex report generation, bulk user imports) using a library like Hangfire or a simple `BackgroundService`. Develop a caching strategy (e.g., using Redis) for frequently accessed, read-heavy data. Implement soft-deletes for entities where data retention is required instead of hard deletion.**  
-* **Optimal Prompt(s):**  
-  * **"Extend the Uphbt.Api to include background job processing using Hangfire. Provide an example of how to offload a long-running task, such as generating a comprehensive bug report (which should retrieve data via service methods that leverage rich domain models but don't directly modify entities), to a background job. Show how to notify the user via SignalR upon job completion. Ensure proper error handling and logging for background jobs. Ensure all method parameters and return types correctly use Nullable Reference Types."**  
-  * **"Integrate a caching mechanism (e.g., Redis using `IDistributedCache`) into the Uphbt.Services project for frequently accessed data like user lists or static lookup data. Provide examples of caching data on read operations and invalidating/updating the cache on write operations (via `Uphbt.Services` methods). Ensure the caching logic seamlessly integrates with service layer calls to rich domain entities without impacting domain logic."**
+    
 
-**3.2. Performance Optimization & Monitoring (Backend & Frontend)**
-
-* **Action: Conduct thorough performance profiling on both the backend (.NET diagnostics tools, SQL Server Profiler) and frontends (browser dev tools, Lighthouse). Identify and optimize database query bottlenecks (e.g., adding indexes, optimizing complex joins, addressing N+1 problems). Implement comprehensive structured logging (e.g., Serilog) and integrate with Application Performance Monitoring (APM) tools (e.g., Azure Application Insights) for both backend and frontend for real-time insights into application health and performance.**  
-* **Optimal Prompt(s):**  
-  * **"Show how to integrate Serilog into the Uphbt.Api project for structured logging. Configure it to log to console and a file, capturing contextual information like `UserPublicId`, request path, and correlating logs across requests (e.g., using `Activity.Current` for tracing). Provide examples of logging various severity levels (Information, Warning, Error) within controllers and services. Ensure proper use of Nullable Reference Types in all logging contexts."**  
-  * **"Outline a strategy for basic performance monitoring for both the .NET 9 backend and the Angular 19 frontend. For the backend, suggest key metrics to track (CPU, memory, request latency, database queries) and tools to use (e.g., built-in .NET diagnostic tools, `Prometheus/Grafana` integration example). For the frontend, suggest using browser developer tools and basic performance metrics (e.g., FCP, LCP) and how to log client-side errors effectively."**
-
-**3.3. Deployment Automation (Docker & CI/CD)**
-
-* **Action: Containerize all application components (Uphbt.Api, Angular Frontend, React Frontend) using Docker. Create `docker-compose.yml` for simplified local development and testing of the multi-service application. Design and implement CI/CD pipelines (e.g., GitHub Actions, Azure DevOps Pipelines) for automated build, test, and deployment to staging and production environments. This includes database migration application during deployment.**  
-* **Optimal Prompt(s):**  
-  * **"Generate Dockerfiles for the Uphbt.Api (.NET 9\) backend, the Uphbt Angular 19 frontend, and the Uphbt React 19 frontend. Provide a `docker-compose.yml` file to orchestrate these three services and a SQL Server container, ensuring correct networking, environment variable configuration for database connection, and proxy settings for local development. Ensure each Dockerfile adheres to best practices for production images (multi-stage builds, minimal base images)."**  
-  * **"Provide a basic GitHub Actions CI/CD workflow YAML file for the `uphbt-backend` repository. The workflow should: (1) build the .NET 9 project, (2) run xUnit tests, and (3) publish the build artifacts. Include a separate step for applying EF Core database migrations before running tests (e.g., in an integration testing environment) and for deployment (e.g., to Azure App Service or a container registry)."**
-
-**3.4. Documentation & AI Learnings**
-
-* **Action: Finalize and polish all API documentation generated by Swagger/OpenAPI. Create comprehensive developer documentation covering architectural decisions (e.g., using Architecture Decision Records \- ADRs), code standards, and setup guides. Develop user manuals for both frontend applications. Crucially, compile and review all AI-generated code, ensuring full human understanding, consistency, adherence to best practices, and addressing any "hallucinations" or suboptimal patterns. Document the AI prompt strategies that proved most effective for different tasks (e.g., code generation, test scaffolding, refactoring).**  
-* **Optimal Prompt(s):**  
-  * **"Provide a template for an Architecture Decision Record (ADR) for the Uphbt project, specifically outlining the decision to use a Rich Domain Model and its implications on the `Uphbt.Domain` and `Uphbt.Services` layers. Include sections for context, decision, consequences, and alternatives considered. Ensure the template encourages clear, concise language and adherence to NRTs where C\# code examples might be included."**  
-  * **"Suggest a structured approach for documenting the AI Prompt Strategy used during the Uphbt project development. Outline key categories of prompts (e.g., initial setup, feature generation, bug fixing, refactoring, test generation, cross-framework translation) and for each, provide examples of highly effective prompt patterns (e.g., "Act as a...", "Generate X, ensuring Y, and adhering to Z"). Discuss methods for validating AI output."**  
-
-
+    
