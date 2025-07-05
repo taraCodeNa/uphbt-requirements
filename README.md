@@ -8,6 +8,8 @@
 
 **Overall Project Goal: To develop a comprehensive bug and project tracking system comprising a robust .NET Web API backend and two distinct Single Page Application (SPA) frontends (Angular and React), serving as a significant upskilling exercise.**
 
+---
+
 **Overall Technology Stack:**
 
 * **Backend: .NET Web API (latest LTS \- .NET 9\) with C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types), Swagger/OpenAPI for API Documentation. Business logic will be primarily implemented in the Rich Domain Model layer, with the Service layer handling orchestration and logic that cannot be performed by entities themselves.**  
