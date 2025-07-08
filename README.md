@@ -8,8 +8,6 @@
 
 **Overall Project Goal: To develop a comprehensive bug and project tracking system comprising a robust .NET Web API backend and two distinct Single Page Application (SPA) frontends (Angular and React), serving as a significant upskilling exercise.**
 
----
-
 **Overall Technology Stack:**
 
 * **Backend: .NET Web API (latest LTS \- .NET 9\) with C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types), Swagger/OpenAPI for API Documentation. Business logic will be primarily implemented in the Rich Domain Model layer, with the Service layer handling orchestration and logic that cannot be performed by entities themselves.**  
@@ -112,7 +110,7 @@
     * **Role Seeding: Pre-seed the roles "user" and "admin" using `RoleManager<ApplicationRole>` in `Program.cs` (or a dedicated data seeding class) during application startup.**  
   * **Initial Migrations: Generate and apply the initial Entity Framework Core database migration for Identity and core application entities.**  
   * **Optimal Prompt(s):**  
-    * **"Provide the `dotnet CLI` commands to generate a .NET 9 solution named 'Uphbt'. Then, generate the following projects within this solution: 'Uphbt.Api' (a webapi project with controllers), 'Uphbt.Services' (a class library), 'Uphbt.Data' (a class library), and 'Uphbt.Domain' (a class library). After project creation, provide the `dotnet add reference` commands to set up the following project references: `Uphbt.Api` \-\> `Uphbt.Services`, `Uphbt.Api` \-\> `Uphbt.Data`, `Uphbt.Services` \-\> `Uphbt.Data`, `Uphbt.Services` \-\> `Uphbt.Domain`, `Uphbt.Data` \-\> `Uphbt.Domain`. Ensure the generated solution and projects are compatible with .NET 9 and fully utilize C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types)."**  
+    * **"Provide the `dotnet CLI` commands to generate a .NET 9 solution named 'Uphbt'. Then, generate the following projects within this solution: 'Uphbt.Api' (a webapi project with controllers), 'Uphbt.Services' (a class library), 'Uphbt.Data' (a class library), and 'Uphbt.Domain' (a class library). After project creation, provide the `dotnet add reference` commands to set up the following project references: `Uphbt.Api` \-\> `Uphbt.Services`, `Uphbt.Services` \-\> `Uphbt.Data`, `Uphbt.Services` \-\> `Uphbt.Domain`, `Uphbt.Data` \-\> `Uphbt.Domain`. Ensure the generated solution and projects are compatible with .NET 9 and fully utilize C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types)."**  
     * **"Generate the `ApplicationDbContext` for a .NET 9 Web API using EF Core with SQL Server. This `DbContext` should integrate ASP.NET Core Identity with `ApplicationUser : IdentityUser<long>` and `ApplicationRole : IdentityRole<long>`, and also include an initial `Bug` entity with `long Id`, `Guid PublicId`, and `byte[] RowVersion`. Provide the necessary `Program.cs` EF Core configuration for SQL Server."**  
     * **"Show me how to set up OpenIddict as an Authorization Server in a .NET 9 Web API using `Program.cs`. Configure it for Authorization Code Flow with PKCE, Refresh Token Flow, define client applications (e.g., for Angular and React SPAs with specific `ClientId` and `RedirectUris`), set short access token lifetimes and longer refresh token lifetimes, and integrate with ASP.NET Core Identity. Explain how OpenIddict's setup enables Refresh Token Rotation and Reuse Detection."**  
     * **"Provide a C\# `LoginController` in a .NET 9 Web API that handles user authentication using `SignInManager<ApplicationUser>`, then stores the issued JWT Access and Refresh Tokens securely server-side, and issues a secure, `HttpOnly`, `SameSite` session cookie to the frontend. Include the setup for a secure logout endpoint that explicitly revokes the user's server-side managed tokens."**  
@@ -300,7 +298,3 @@
     * **"Show me a `docker-compose.yml` file that orchestrates a .NET 9 Web API (connecting to SQL Server via Docker), an Angular v20 frontend, and a React v19 frontend for a local development environment, ensuring proper network configuration for `HttpOnly` cookies."**  
     * **"How to set up a GitHub Actions workflow that orchestrates building a .NET 9 API, an Angular app, and a React app, running their tests, then building and pushing their Docker images to GitHub Container Registry."**  
     * **"Guide me on creating a GitHub Actions workflow to automatically deploy Docker containers from GitHub Container Registry to Azure App Services for a .NET 9 API and a single SPA frontend, considering the BFF pattern and `HttpOnly` cookies."**
-
-    
-
-    
