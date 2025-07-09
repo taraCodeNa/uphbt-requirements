@@ -113,7 +113,6 @@
     * **`Uphbt.Data` (a class library, responsible for infrastructure/persistence, which will contain EF Core configuration for persistence-ignorant POCOs using Fluent API)**  
     * **`Uphbt.Domain` (a class library, containing the rich, persistence-ignorant domain model, including entities, value objects, and repository interfaces). After project creation, provide the `dotnet add reference` commands to set up the following clean architecture project references:**  
     * **`Uphbt.Api` \-\> `Uphbt.Services`**  
-    * **`Uphbt.Api` \-\> `Uphbt.Domain`**  
     * **`Uphbt.Services` \-\> `Uphbt.Data`**  
     * **`Uphbt.Services` \-\> `Uphbt.Domain`**  
     * **`Uphbt.Data` \-\> `Uphbt.Domain` Ensure the generated solution and projects are compatible with .NET 9 and fully utilize C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types)."**  
@@ -121,7 +120,7 @@
   * **"Show me how to set up OpenIddict as an Authorization Server in a .NET 9 Web API using `Program.cs`. Configure it for Authorization Code Flow with PKCE, Refresh Token Flow, define client applications (e.g., for Angular and React SPAs with specific `ClientId` and `RedirectUris`), set short access token lifetimes and longer refresh token lifetimes, and integrate with ASP.NET Core Identity. Explain how OpenIddict's setup enables Refresh Token Rotation and Reuse Detection."**  
   * **"Provide a C\# `LoginController` in a .NET 9 Web API that handles user authentication using `SignInManager<ApplicationUser>`, then stores the issued JWT Access and Refresh Tokens securely server-side, and issues a secure, HttpOnly, SameSite session cookie to the frontend. Include the setup for a secure logout endpoint that explicitly revokes the user's server-side managed tokens."**  
   * **"How to implement BCrypt.Net-Next for password hashing within ASP.NET Core Identity in a .NET 9 application."**  
-  * **"Guide me on how to perform initial role seeding for 'user' and 'admin' roles using `RoleManager<ApplicationRole>` during application startup in `Program.cs`."**  
+  * **"Guide me on how to perform initial role seeding for 'user' and 'admin' roles using `RoleManager<ApplicationRole>` in `Program.cs` (or a dedicated data seeding class) during application startup."**  
   * **"Generate a basic example of server-side internationalization (i18n) setup in a .NET 9 Web API using `Microsoft.Extensions.Localization` for a `SharedResources.cs` file."**  
   * **"How to configure Swagger/OpenAPI in a .NET 9 Web API for API documentation and UI, including configuring API versioning if applicable."**  
   * **"How to configure HTTPS for a .NET 9 Web API in `appsettings.json` and `Program.cs` for development, including setting up a self-signed certificate if necessary for local development."**
@@ -346,3 +345,4 @@
 * **Data Access Layer (Persistence Layer): This is your `Uphbt.Data` project (Entity Framework Core). It handles communication with the database.**
 
 **So, while the Web API serves as the presentation layer for the backend's capabilities, in the broader context of a multi-tier application, it's typically categorized as part of the Application Layer or an API Gateway between the UI and the core business logic.**
+
