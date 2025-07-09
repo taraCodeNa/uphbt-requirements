@@ -6,7 +6,9 @@
 
 ---
 
-Overall Project Goal: To develop a comprehensive bug and project tracking system comprising a robust .NET Web API backend and two distinct Single Page Application (SPA) frontends (Angular and React), serving as a significant upskilling exercise.
+## **Overall Project Goal:**
+
+To develop a comprehensive bug and project tracking system comprising a robust .NET Web API backend and two distinct Single Page Application (SPA) frontends (Angular and React), serving as a significant upskilling exercise.
 
 ---
 
@@ -76,7 +78,7 @@ Overall Project Goal: To develop a comprehensive bug and project tracking system
 #### **1.1. Backend (.NET) & Database Setup**
 
 * **Action:**  
-  * Initial project setup with a Rich Domain Model design, emphasizing **persistence-ignorance (POCOs without EF Core specific attributes/interfaces in the domain layer)**. Domain entities will encapsulate their own behavior, containing methods that represent business operations and enforce invariants.  
+  * Initial project setup with a Rich Domain Model design, emphasizing **persistence-ignorance (POCOs without EF Core specific attributes/interfaces in the domain layer, *except* for the core `User` entity)**. Domain entities will encapsulate their own behavior, containing methods that represent business operations and enforce invariants.  
   * Define internal primary keys as `long` (mapping to `BIGINT IDENTITY` in SQL Server) and all foreign keys should also be `long`.  
   * Each entity (e.g., **User**, Bug, Comment) should also have a `Guid PublicId` property that is unique and will be exposed to the application layer.  
   * Include a `byte[] RowVersion` property on entities (starting with User) for optimistic concurrency.  
@@ -100,33 +102,37 @@ Overall Project Goal: To develop a comprehensive bug and project tracking system
   * **I18n/L10n:** Set up server-side internationalization using `Microsoft.Extensions.Localization`.  
   * **API Documentation:** Integrate **Swagger/OpenAPI** middleware for API documentation and interactive testing.  
   * **Code Quality:** All C\# code must fully leverage Nullable Reference Types (NRTs) to explicitly define nullability, ensuring properties and method return types reflect whether null is a valid state or value.  
-  * **Specific for Identity (Persistence-Ignorant Domain):**  
-    * Introduce a pure **`User` domain entity** in `Uphbt.Domain` which is a POCO and contains core user properties (`PublicId`, `FullName`, `DateHired`) and business logic. It **will NOT inherit from `IdentityUser<long>`**.  
-    * In `Uphbt.Data`, define an **`AppIdentityUser` class inheriting from `IdentityUser<long>`** (or similar name like `PersistenceUser`) which is the actual EF Core entity for Identity.  
-    * Configure EF Core to map your domain `User` entity to its corresponding database table, separate from `AppIdentityUser`'s mapping.  
-    * For roles, directly use `ApplicationRole` inheriting from `IdentityRole<long>` and leverage ASP.NET Core Identity's built-in role management mechanisms in the `Uphbt.Data` layer.  
-    * **Role Seeding:** Pre-seed the roles "user" and "admin" using `RoleManager<ApplicationRole>` in `Program.cs` (or a dedicated data seeding class) during application startup.  
+  * **Specific for Identity (Direct Integration of `User` and `Role`):**  
+    * Define the **`User` entity in `Uphbt.Domain`** which **WILL inherit from `IdentityUser<long>`**. This `User` will be the primary representation of a user across your domain and identity layers.  
+    * Ensure `User` is a **rich domain model**, not just a data bag. It will include core business-specific properties like `PublicId` (for public exposure, distinct from `Id` inherited from `IdentityUser<long>`), `FullName`, `DateHired`, and **will contain business logic methods** (e.g., `UpdateProfileInfo(string newFullName)`, `AssignInternalRole(string role)`).  
+    * The `Uphbt.Domain` project **will have a package reference to `Microsoft.AspNetCore.Identity`** to support the `User` inheritance. **It will NOT have a package reference to `Microsoft.EntityFrameworkCore`**.  
+    * For roles, define the **`Role` entity in `Uphbt.Data`** which **WILL inherit from `IdentityRole<long>`**. This `Role` will be used by Identity for managing user permissions.  
+    * In `Uphbt.Data`, `ApplicationDbContext` will derive from `IdentityDbContext<User, Role, long>`. EF Core configuration in `Uphbt.Data` will map `User` and `Role` to the database.  
+    * `UserManager<User>` and `SignInManager<User>` will be used directly by services in `Uphbt.Services` (or dedicated authentication services) to manage users and sign-in operations, since `User` is now directly compatible.  
+    * `RoleManager<Role>` will be used by services in `Uphbt.Services` to manage roles (creating, assigning, etc.).  
+    * **Role Seeding:** Pre-seed the roles "user" and "admin" using `RoleManager<Role>` in `Program.cs` (or a dedicated data seeding class) during application startup.  
   * **Initial Migrations:** Generate and apply the initial Entity Framework Core database migration for Identity and core application entities.  
   * **HTTPS Configuration:** Configure the `uphbt-backend`'s **Web API project to run using HTTPS**, ensuring secure communication for all endpoints, especially for development and local testing.  
 * **Optimal Prompt(s):**  
-  * "Provide the `dotnet CLI` commands to generate a .NET 9 solution named 'Uphbt'. Then, generate the following projects within this solution, keeping in mind their architectural roles and the goal of persistence-ignorance and the correct dependency flow for DTOs:  
+  * "Provide the `dotnet CLI` commands to generate a .NET 9 solution named 'Uphbt'. Then, generate the following projects within this solution, keeping in mind their architectural roles and the adjusted dependency flow:  
     * **`Uphbt.Api` (an HTTPS-based webapi project with controllers, and uses Swagger. This project serves as the Backend's Presentation Layer, exposing the backend's capabilities via RESTful endpoints. Provide an instruction how to add and configure Swagger UI to .NET 9 Web API as SwaggerUI is no longer included by default)**  
     * **`Uphbt.Contracts`** (a class library, specifically for **Data Transfer Objects (DTOs)** and shared contracts between `Uphbt.Api` and `Uphbt.Services`)  
     * **`Uphbt.Services`** (a class library, representing the application layer)  
-    * **`Uphbt.Data`** (a class library, responsible for infrastructure/persistence, which will contain **EF Core configuration for persistence-ignorant POCOs using Fluent API and the `AppIdentityUser` class for Identity**)  
-    * **`Uphbt.Domain`** (a class library, containing the **pure, rich, persistence-ignorant domain model**, including entities, value objects, and repository interfaces like `IUserRepository`). After project creation, provide the `dotnet add reference` commands to set up the following clean architecture project references:  
+    * **`Uphbt.Data`** (a class library, responsible for infrastructure/persistence, which will contain **EF Core configuration for persistence-ignorant POCOs and the `ApplicationDbContext` for Identity**)  
+    * **`Uphbt.Domain`** (a class library, containing the **pure, rich, domain model entities, including `User` which inherits `IdentityUser<long>`, value objects, and repository interfaces like `IUserRepository`**). After project creation, provide the `dotnet add reference` commands to set up the following clean architecture project references:  
     * `Uphbt.Api` \-\> `Uphbt.Services`  
     * `Uphbt.Api` \-\> `Uphbt.Contracts`  
     * `Uphbt.Services` \-\> `Uphbt.Data`  
     * `Uphbt.Services` \-\> `Uphbt.Domain`  
     * `Uphbt.Services` \-\> `Uphbt.Contracts`  
-    * `Uphbt.Data` \-\> `Uphbt.Domain` Ensure the generated solution and projects are compatible with .NET 9 and fully utilize C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types)."  
-  * "Generate a pure, persistence-ignorant `User` domain entity in C\# for `Uphbt.Domain`. It should be a POCO with properties like `long Id`, `Guid PublicId`, `string FullName`, `DateTime? DateHired`. It should NOT inherit from `IdentityUser<long>`. Include an `IUserRepository` interface in `Uphbt.Domain`."  
-  * "Generate the `ApplicationDbContext` for a .NET 9 Web API using EF Core with SQL Server. This `DbContext` should integrate ASP.NET Core Identity using an `AppIdentityUser : IdentityUser<long>` class and `ApplicationRole : IdentityRole<long>`. It must also include an initial Bug entity with `long Id`, `Guid PublicId`, and `byte[] RowVersion`. Provide the necessary `Program.cs` EF Core configuration for SQL Server. Demonstrate how to map the `User` domain entity to its corresponding database table using EF Core Fluent API, separately from `AppIdentityUser`."  
-  * "Show me how to set up OpenIddict as an Authorization Server in a .NET 9 Web API using `Program.cs`. Configure it for Authorization Code Flow with PKCE, Refresh Token Flow, define client applications (e.g., for Angular and React SPAs with specific `ClientId` and `RedirectUris`), set short access token lifetimes and longer refresh token lifetimes, and integrate with ASP.NET Core Identity (using `AppIdentityUser`). Explain how OpenIddict's setup enables Refresh Token Rotation and Reuse Detection."  
-  * "Provide a C\# `LoginController` in a .NET 9 Web API that handles user authentication using `SignInManager<AppIdentityUser>`, then stores the issued JWT Access and Refresh Tokens securely server-side, and issues a secure, HttpOnly, SameSite session cookie to the frontend. Include the setup for a secure logout endpoint that explicitly revokes the user's server-side managed tokens."  
-  * "How to implement BCrypt.Net-Next for password hashing within ASP.NET Core Identity in a .NET 9 application, using `AppIdentityUser`."  
-  * "Guide me on how to perform initial role seeding for 'user' and 'admin' roles using `RoleManager<ApplicationRole>` in `Program.cs` (or a dedicated data seeding class) during application startup."  
+    * `Uphbt.Data` \-\> `Uphbt.Domain`  
+      Ensure the generated solution and projects are compatible with .NET 9 and fully utilize C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types). Crucially, explain that `Uphbt.Domain` will only have a package reference to `Microsoft.AspNetCore.Identity`, and `Uphbt.Data` will have a reference to `Microsoft.AspNetCore.Identity.EntityFrameworkCore` and `Microsoft.EntityFrameworkCore.SqlServer`."  
+  * "Generate a rich domain model `User` entity in C\# for `Uphbt.Domain`. It should inherit from `IdentityUser<long>` and include additional business-specific properties like `Guid PublicId`, `string FullName`, `DateTime? DateHired`. Crucially, demonstrate how to implement business logic methods within this entity (e.g., `UpdateProfileInfo(string newFullName)`, `AssignApplicationRole(string role)`)."  
+  * "Generate the `ApplicationDbContext` for a .NET 9 Web API using EF Core with SQL Server. This `DbContext` should derive from `IdentityDbContext<User, Role, long>`. The `Role` class should inherit `IdentityRole<long>` and be defined in `Uphbt.Data`. Provide the necessary `Program.cs` EF Core configuration for SQL Server, including how to register `UserManager<User>`, `SignInManager<User>`, and `RoleManager<Role>`."  
+  * "Show me how to set up OpenIddict as an Authorization Server in a .NET 9 Web API using `Program.cs`. Configure it for Authorization Code Flow with PKCE, Refresh Token Flow, define client applications (e.g., for Angular and React SPAs with specific `ClientId` and `RedirectUris`), set short access token lifetimes and longer refresh token lifetimes, and integrate with ASP.NET Core Identity (using `User`). Explain how OpenIddict's setup enables Refresh Token Rotation and Reuse Detection."  
+  * "Provide a C\# `LoginController` in a .NET 9 Web API that handles user authentication by interacting with `SignInManager<User>`, then stores the issued JWT Access and Refresh Tokens securely server-side, and issues a secure, HttpOnly, SameSite session cookie to the frontend. Include the setup for a secure logout endpoint that explicitly revokes the user's server-side managed tokens."  
+  * "How to implement BCrypt.Net-Next for password hashing within ASP.NET Core Identity in a .NET 9 application, using `User`."  
+  * "Guide me on how to perform initial role seeding for 'user' and 'admin' roles using `RoleManager<Role>` in `Program.cs` (or a dedicated data seeding class) during application startup."  
   * "Generate a basic example of server-side internationalization (i18n) setup in a .NET 9 Web API using `Microsoft.Extensions.Localization` for a `SharedResources.cs` file."  
   * "How to configure **Swagger/OpenAPI** in a .NET 9 Web API for API documentation and UI, including configuring API versioning if applicable."  
   * "How to configure **HTTPS for a .NET 9 Web API** in `appsettings.json` and `Program.cs` for development, including setting up a self-signed certificate if necessary for local development."
@@ -205,14 +211,14 @@ Overall Project Goal: To develop a comprehensive bug and project tracking system
   * **Rich Domain Model Implementation:** Implement Bug and Comment as rich domain entities with encapsulated business logic. Entities will have methods that represent business operations (`Bug.AssignUser()`, `Bug.ChangeStatus()`, `Bug.AddComment()`) and enforce their own invariants.  
   * Define Value Objects (e.g., `BugStatus`, `Severity`, `Priority`) as immutable types where appropriate.  
   * Ensure Bug and Comment entities also include `Guid PublicId` and `byte[] RowVersion` properties for API exposure and optimistic concurrency, respectively.  
-  * **Repository Pattern Implementation:** Create dedicated EF Core repositories (`IBugRepository`, `ICommentRepository`) for data persistence, returning domain entities. **Implement a `IUserRepository` that maps between `AppIdentityUser` and the `User` domain entity.**  
-  * **Service Layer Implementation:** Develop application services (`BugService`, `CommentService`, **`UserService`**) to orchestrate domain operations, handle transactions, and interact with repositories. Services will be lean, delegating complex logic to the rich domain model. These services will accept and return DTOs defined in `Uphbt.Contracts`. For user-related operations, the `UserService` will interact with `IUserRepository` (to manage domain `User` entities) and potentially `UserManager<AppIdentityUser>` (for password changes, role assignments specific to Identity).  
+  * **Repository Pattern Implementation:** Create dedicated EF Core repositories (`IBugRepository`, `ICommentRepository`, `IUserRepository`) for data persistence, returning domain entities. `IUserRepository` will manage `User` entities.  
+  * **Service Layer Implementation:** Develop application services (`BugService`, `CommentService`, `UserService`) to orchestrate domain operations, handle transactions, and interact with repositories. Services will be lean, delegating complex logic to the rich domain model. These services will accept and return DTOs defined in `Uphbt.Contracts`. The `UserService` will directly leverage `UserManager<User>` and `SignInManager<User>` for user management (registration, login, profile updates, password changes, role assignments).  
   * **DTOs:** The `Uphbt.Api` layer will use Data Transfer Objects (DTOs) from `Uphbt.Contracts` for API requests and responses, with clear mapping between DTOs and domain entities/service layer results.  
   * **API Endpoints for CRUD:** Create comprehensive RESTful API endpoints for:  
     * Creating, reading (list with filtering/sorting/pagination, by PublicId), updating, and deleting Bugs.  
     * Adding, reading (by Bug PublicId), updating, and deleting Comments.  
-    * **Managing User profiles and other non-authentication specific user operations using the `User` domain entity.**  
-  * **Authorization:** Apply robust authorization attributes (`[Authorize]`, `[Authorize(Roles="Admin")]`, or custom policy-based authorization based on `AppIdentityUser` claims/roles derived from the server-side managed JWT) to all relevant endpoints to ensure only authorized users can perform actions.  
+    * **Managing User profiles and other non-authentication specific user operations using the `User` entity and appropriate DTOs.**  
+  * **Authorization:** Apply robust authorization attributes (`[Authorize]`, `[Authorize(Roles="Admin")]`, or custom policy-based authorization based on `User` claims/roles derived from the server-side managed JWT) to all relevant endpoints to ensure only authorized users can perform actions.  
   * **Real-time Communication with SignalR:**  
     * Implement ASP.NET Core SignalR Hubs (e.g., `BugHub`, `CommentHub`) for real-time updates.  
     * Secure SignalR Hubs using cookie-based authentication (as the frontend will send the HttpOnly session cookie), or by allowing the frontend to send a separate, short-lived, non-HttpOnly JWT for SignalR connection if needed (less ideal for full XSS hardening, but an option if cookie-based SignalR auth is tricky). The primary goal is to ensure only authenticated users with valid sessions can connect and receive updates.  
@@ -224,7 +230,7 @@ Overall Project Goal: To develop a comprehensive bug and project tracking system
   * "Generate RESTful API endpoints in a .NET 9 Web API for CRUD operations on 'Bug' entities (using their `PublicId`s) that accept and return DTOs from `Uphbt.Contracts`. Include `[Authorize]` attributes (e.g., allowing only authenticated users to create, and 'Admin' role to delete), and demonstrate handling optimistic concurrency conflicts with `RowVersion`."  
   * "Guide me through securing an ASP.NET Core SignalR Hub using cookie-based authentication in .NET 9, ensuring users are authenticated via the HttpOnly session cookie before connecting."  
   * "Show how to broadcast real-time updates from a SignalR Hub (`BugHub`) to connected clients (e.g., when a bug's status changes or a new comment is added) from a service layer."  
-  * "How to implement an `AppIdentityUserRepository` in `Uphbt.Data` that implements `IUserRepository` (from `Uphbt.Domain`) and maps between the `User` domain entity and `AppIdentityUser` (IdentityUser) for persistence, using EF Core."
+  * "How to implement a `UserService` (implementing `IUserService` or just a direct `UserService` using `UserManager<User>` and `SignInManager<User>`) in `Uphbt.Services` for user registration, login, profile updates, and role assignments, directly operating on the `User` entity."
 
 #### **2.2. Frontend: Bug & Comment Management UI (Angular & React)**
 
@@ -270,7 +276,7 @@ Overall Project Goal: To develop a comprehensive bug and project tracking system
 * **Optimal Prompt(s):**  
   * "How to integrate Serilog into a .NET 9 Web API for structured logging, including logging contextual information like the authenticated user's `PublicId` (derived from the server-side managed JWT) and using different log sinks?"  
   * "Provide a C\# example of a global exception handling middleware that catches exceptions and maps them to RFC 7807 `ProblemDetails` responses in a .NET 9 Web API."  
-  * "Show me how to use FluentValidation to define and apply validation rules for a DTO in `Uphbt.Contracts` and use them for a DTO in a .NET 9 Web API, ensuring validation failures are returned as `ProblemDetails`."  
+  * "Show me how to use FluentValidation to define and apply validation rules for a DTO in `Uphbt.Contracts` and use them for a D.NET 9 Web API, ensuring validation failures are returned as `ProblemDetails`."  
   * "Guide me through creating a custom authorization policy in ASP.NET Core (.NET 9\) that verifies if the authenticated user (identified by `PublicId` from the server-side managed JWT) has permission to edit a specific bug (e.g., if they are the reporter or an client)."
 
 #### **3.2. Frontend: Enhancements (Angular & React)**
@@ -281,7 +287,7 @@ Overall Project Goal: To develop a comprehensive bug and project tracking system
   * **State Management Refinement:**  
     * **(Angular):** If the application state becomes complex, consider dedicated state management libraries like NgRx (for reactive state management) or Akita (for a more opinionated, simpler approach), understanding their patterns and trade-offs.  
     * **(React):** If global state management needs escalate beyond Context API/hooks, explore Zustand (lightweight and flexible) or Redux Toolkit (opinionated and powerful) for managing application-wide state.  
-  * **Client-Side Routing Guards (Refinement):** Ensure routing guards comprehensively handle not only authenticated vs. unauthenticated states but also authorization based on user roles/claims (e.g., `CanActivate` based on user's `ApplicationRole` or specific permissions from the backend's session validation), integrating with the `AuthService` or `useAuth` hook.  
+  * **Client-Side Routing Guards (Refinement):** Ensure routing guards comprehensively handle not only authenticated vs. unauthenticated states but also authorization based on user roles/claims (e.g., `CanActivate` based on user's `Role` or specific permissions from the backend's session validation), integrating with the `AuthService` or `useAuth` hook.  
   * **I18n/L10n:** Implement advanced internationalization features (e.g., language switching, pluralization, date/time formatting) in both Angular (`ngx-translate`) and React (`i18next`).  
 * **Optimal Prompt(s):**  
   * "How to implement a global HTTP interceptor in Angular that shows a loading spinner during API calls and displays toast notifications for success/error messages using Angular Material `SnackBar`."  
@@ -356,3 +362,4 @@ A REST API (and by extension, a .NET Web API implementing REST principles) prima
 * **Data Access Layer (Persistence Layer):** This is your `Uphbt.Data` project (Entity Framework Core). It handles communication with the database.
 
 So, while the Web API **serves as the presentation layer for the backend's capabilities**, in the broader context of a multi-tier application, it's typically categorized as part of the **Application Layer** or an **API Gateway** between the UI and the core business logic.
+
