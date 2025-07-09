@@ -10,7 +10,7 @@
 
 ---
 
-**Overall Technology Stack:**
+## **Overall Technology Stack:**
 
 * **Backend: .NET Web API (latest LTS \- .NET 9\) with C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types), Swagger/OpenAPI for API Documentation. Business logic will be primarily implemented in the Rich Domain Model layer, with the Service layer handling orchestration and logic that cannot be performed by entities themselves.**  
   * **Database: SQL Server (latest stable version).**  
@@ -23,6 +23,7 @@
   * **Internationalization & Localization (i18n/l10n): ngx-translate.**  
 * **Frontend 2 (React): Bug Tracker (Full Features \- Mirror of Angular) \- React (v19 LTS) \- Using React Hook Form and Material UI (MUI) Library (with Proxy for Dev).**  
   * **Internationalization & Localization (i18n/l10n): i18next & react-i18next.**  
+* **HTTPS: All three components (`uphbt-backend`'s Web API project, `uphbt-angular-frontend`, and `uphbt-react-frontend`) will be configured to use HTTPS for secure communication, both in development and production (where applicable).**  
 * **Testing:**  
   * **.NET: xUnit, Moq, Microsoft.AspNetCore.Mvc.Testing.**  
   * **Angular: Jasmine, Karma, Angular Testing Bed, HttpClientTestingModule.**  
@@ -66,9 +67,9 @@
 
     ---
 
-**High-Level Roadmap:**
+    ## **High-Level Roadmap:**
 
-### **Phase 1: Core Foundation, Security & i18n Setup (Month 1 \- 1.5)**
+    ### **Phase 1: Core Foundation, Security & i18n Setup (Month 1 \- 1.5)**
 
 **Goal: Establish a secure, robust backend and foundational authentication/authorization using OpenIddict and a BFF pattern for XSS hardening. Set up the basic i18n/l10n framework across all layers and both frontends, using AI to accelerate initial setup.**
 
@@ -97,16 +98,17 @@
     * **Client Configuration: Dynamically or statically register your Angular and React clients within OpenIddict's configuration/database, specifying `ClientId`, `RedirectUris`, `PostLogoutRedirectUris`, and allowed `GrantTypes`/`Scopes` (including `openid`, `profile`, `email`, `offline_access`).**  
     * **Use BCrypt.Net-Next for secure password hashing within ASP.NET Core Identity.**  
   * **I18n/L10n: Set up server-side internationalization using `Microsoft.Extensions.Localization`.**  
-  * **Middleware: Integrate Swagger/OpenAPI middleware for API documentation and interactive testing.**  
+  * **API Documentation: Integrate Swagger/OpenAPI middleware for API documentation and interactive testing.**  
   * **Code Quality: All C\# code must fully leverage Nullable Reference Types (NRTs) to explicitly define nullability, ensuring properties and method return types reflect whether null is a valid state or value.**  
   * **Specific for Identity:**  
     * **Customize `ApplicationUser` to inherit from `IdentityUser<long>` and add `FullName` (string, non-nullable) and `DateHired` (`DateTime?`, nullable) properties directly to it, along with the `Guid PublicId` property (non-nullable).**  
     * **For roles, directly use `ApplicationRole` inheriting from `IdentityRole<long>` and leverage ASP.NET Core Identity's built-in role management mechanisms.**  
     * **Role Seeding: Pre-seed the roles "user" and "admin" using `RoleManager<ApplicationRole>` in `Program.cs` (or a dedicated data seeding class) during application startup.**  
   * **Initial Migrations: Generate and apply the initial Entity Framework Core database migration for Identity and core application entities.**  
+  * **HTTPS Configuration: Configure the `uphbt-backend`'s Web API project to run using HTTPS, ensuring secure communication for all endpoints, especially for development and local testing.**  
 * **Optimal Prompt(s):**  
   * **"Provide the `dotnet CLI` commands to generate a .NET 9 solution named 'Uphbt'. Then, generate the following projects within this solution, keeping in mind their architectural roles and the goal of persistence-ignorance:**  
-    * **`Uphbt.Api` (a webapi project with controllers, serving as the presentation layer)**  
+    * **`Uphbt.Api` (an HTTPS-based webapi project with controllers, and uses Swagger. This project serves as the Backend's Presentation Layer, exposing the backend's capabilities via RESTful endpoints. Provide an instruction how to add and configure Swagger UI to .NET 9 Web API as SwaggerUI is no longer included by default)**  
     * **`Uphbt.Services` (a class library, representing the application layer)**  
     * **`Uphbt.Data` (a class library, responsible for infrastructure/persistence, which will contain EF Core configuration for persistence-ignorant POCOs using Fluent API)**  
     * **`Uphbt.Domain` (a class library, containing the rich, persistence-ignorant domain model, including entities, value objects, and repository interfaces). After project creation, provide the `dotnet add reference` commands to set up the following clean architecture project references:**  
@@ -120,7 +122,9 @@
   * **"Provide a C\# `LoginController` in a .NET 9 Web API that handles user authentication using `SignInManager<ApplicationUser>`, then stores the issued JWT Access and Refresh Tokens securely server-side, and issues a secure, HttpOnly, SameSite session cookie to the frontend. Include the setup for a secure logout endpoint that explicitly revokes the user's server-side managed tokens."**  
   * **"How to implement BCrypt.Net-Next for password hashing within ASP.NET Core Identity in a .NET 9 application."**  
   * **"Guide me on how to perform initial role seeding for 'user' and 'admin' roles using `RoleManager<ApplicationRole>` during application startup in `Program.cs`."**  
-  * **"Generate a basic example of server-side internationalization (i18n) setup in a .NET 9 Web API using `Microsoft.Extensions.Localization` for a `SharedResources.cs` file."**
+  * **"Generate a basic example of server-side internationalization (i18n) setup in a .NET 9 Web API using `Microsoft.Extensions.Localization` for a `SharedResources.cs` file."**  
+  * **"How to configure Swagger/OpenAPI in a .NET 9 Web API for API documentation and UI, including configuring API versioning if applicable."**  
+  * **"How to configure HTTPS for a .NET 9 Web API in `appsettings.json` and `Program.cs` for development, including setting up a self-signed certificate if necessary for local development."**
 
     #### **1.2. Frontend 1 (Angular) \- Core Setup, Security & i18n Integration (uphbt-angular-frontend)**
 
@@ -142,13 +146,15 @@
   * **Forms: Utilize Angular's Reactive Forms for login, registration, and user profile forms, with comprehensive client-side validation using `Validators`.**  
   * **I18n/L10n: Integrate `ngx-translate` for frontend internationalization, setting up translation files (JSON) and configuring the translation service.**  
   * **Configure proxy for development server to handle API calls.**  
+  * **HTTPS Configuration: Configure the `uphbt-angular-frontend` development server to serve the application over HTTPS, ensuring all development traffic is encrypted.**  
 * **Optimal Prompt(s):**  
   * **"Guide me through setting up an Angular v20 project to implement the client-side of the Authorization Code Flow with PKCE for authentication, where the backend handles JWTs and issues an HttpOnly session cookie to the frontend for XSS protection. Show the redirect to the backend's authorization endpoint and handling the callback."**  
   * **"Provide an Angular `AuthService` example that manages user login and logout by initiating redirects and clearing session state, without directly handling JWT Access or Refresh Tokens in JavaScript."**  
   * **"Generate an Angular HTTP Interceptor that detects 401 Unauthorized responses and redirects the user to the login page, as the backend is managing tokens via an HttpOnly session cookie. Explain why explicit JWT attachment is not needed here."**  
   * **"How to implement Angular Route Guards to protect routes, by checking the user's authentication status based on a session cookie (e.g., by calling a backend `/me` endpoint)."**  
   * **"How to integrate `ngx-translate` into an Angular v20 project, including setting up translation files and using the translate pipe/service."**  
-  * **"Show an Angular Reactive Form for user login with client-side validation and Angular Material components."**
+  * **"Show an Angular Reactive Form for user login with client-side validation and Angular Material components."**  
+  * **"How to configure the Angular CLI development server to serve the application over HTTPS using a self-signed certificate, and how to configure API proxying for HTTPS backend endpoints."**
 
     #### **1.3. Frontend 2 (React) \- Core Setup, Security & i18n Integration (uphbt-react-frontend)**
 
@@ -170,6 +176,7 @@
   * **Forms: Utilize React Hook Form for robust login, registration, and user profile forms, integrating with MUI components and using schema validation (e.g., Zod, Yup).**  
   * **I18n/L10n: Integrate `i18next` and `react-i18next` for frontend internationalization, setting up translation files (JSON) and configuring the translation service.**  
   * **Configure proxy for development server to handle API calls.**  
+  * **HTTPS Configuration: Configure the `uphbt-react-frontend` development server to serve the application over HTTPS, ensuring all development traffic is encrypted.**  
 * **Optimal Prompt(s):**  
   * **"Guide me through setting up a React v19 project to implement the client-side of the Authorization Code Flow with PKCE for authentication, where the backend handles JWTs and issues an HttpOnly session cookie to the frontend for XSS protection. Show the redirect to the backend's authorization endpoint and handling the callback."**  
   * **"Provide a React `AuthContext` and `useAuth` hook example that manages user login and logout by initiating redirects and clearing session state, without directly handling JWT Access or Refresh Tokens in JavaScript."**  
@@ -177,11 +184,12 @@
   * **"How to implement private routes in React Router that check the user's authentication status based on a session cookie (e.g., by calling a backend `/me` endpoint)."**  
   * **"How to integrate `i18next` and `react-i18next` into a React v19 project, including setting up translation files and using `useTranslation`."**  
   * **"Show a React Hook Form example for user login with client-side validation using Zod and MUI components."**  
+  * **"How to configure a Create React App (or similar React setup) development server to serve the application over HTTPS, and how to set up proxying for HTTPS backend API calls."**  
     ---
 
-**High-Level Roadmap:**
+    ## **High-Level Roadmap:**
 
-### **Phase 2: Feature Development & Real-Time Functionality**
+    ### **Phase 2: Feature Development & Real-Time Functionality**
 
 **Goal: Implement the core business logic for Bug and Comment management, including real-time updates.**
 
@@ -233,9 +241,9 @@
   * **"Provide an example of an Angular service method that calls a PUT API endpoint for updating a bug, handles `RowVersion` for optimistic concurrency, and provides user feedback."**  
     ---
 
-**High-Level Roadmap:**
+    ## **High-Level Roadmap:**
 
-### **Phase 3: Enhancements, Testing & Deployment**
+    ### **Phase 3: Enhancements, Testing & Deployment**
 
 **Goal: Refine the application with additional features, ensure quality through comprehensive testing, and prepare for deployment.**
 
@@ -252,7 +260,7 @@
   * **"How to integrate Serilog into a .NET 9 Web API for structured logging, including logging contextual information like the authenticated user's `PublicId` (derived from the server-side managed JWT) and using different log sinks?"**  
   * **"Provide a C\# example of a global exception handling middleware that catches exceptions and maps them to RFC 7807 `ProblemDetails` responses in a .NET 9 Web API."**  
   * **"Show me how to use FluentValidation to define and apply validation rules for a DTO in a .NET 9 Web API, ensuring validation failures are returned as `ProblemDetails`."**  
-  * **"Guide me through creating a custom authorization policy in ASP.NET Core (.NET 9\) that verifies if the authenticated user (identified by `PublicId` from the server-side managed JWT) has permission to edit a specific bug (e.g., if they are the reporter or an admin)."**
+  * **"Guide me through creating a custom authorization policy in ASP.NET Core (.NET 9\) that verifies if the authenticated user (identified by `PublicId` from the server-side managed JWT) has permission to edit a specific bug (e.g., if they are the reporter or an client)."**
 
     #### **3.2. Frontend: Enhancements (Angular & React)**
 
@@ -296,6 +304,7 @@
   * **Docker Compose: Create a Docker Compose file to orchestrate the backend, database (e.g., SQL Server or PostgreSQL container), and potentially Redis (for distributed cache/session storage if used with BFF pattern).**  
   * **Containerization for Frontends: (Optional, but recommended for consistent environments) Create Dockerfiles for the Angular and React applications, if they will be served via separate containers or a reverse proxy.**  
   * **Local Deployment: Ensure the entire stack can be brought up and down easily using Docker Compose for local development and testing.**  
+  * **HTTPS Configuration in Docker Compose: Configure all services (`uphbt-backend`, `uphbt-angular-frontend`, `uphbt-react-frontend`) within the Docker Compose setup to expose and use HTTPS for inter-service communication and external access.**  
   * **Deployment to Cloud (Future): Plan for deployment to a cloud provider (e.g., Azure App Service, AWS ECS, Kubernetes) using the created Docker images.**  
 * **Optimal Prompt(s):**  
   * **"Provide a Dockerfile for a .NET 9 Web API that optimizes for multi-stage builds and smaller image size."**  
@@ -303,5 +312,37 @@
   * **"How to containerize an Angular v20 application using Docker for local development and eventual deployment."**  
   * **"Show me how to containerize a React v19 application using Docker for local development and eventual deployment."**  
   * **"Guide me on how to configure the .NET 9 Web API and Angular/React applications to correctly communicate when deployed via Docker Compose."**  
-      
-    
+  * **"How to configure Nginx (or another reverse proxy) within a Docker Compose setup to handle HTTPS termination and route traffic to backend and frontend services, including managing certificates (e.g., self-signed for local, or Let's Encrypt for production)."**  
+    ---
+
+    ### **Clarification on "Presentation Layer" and REST APIs:**
+
+**When we talk about a multi-tier or layered architecture (like the one described for the backend: API, Services, Data, Domain), the term "presentation layer" for the `Uphbt.Api` project refers to its role *within the backend system itself*, not directly to the end-user interface.**
+
+**Think of it this way:**
+
+* **For the end-user: The Angular and React frontends are the User Interface (UI) Presentation Layer. This is what the user directly sees and interacts with.**  
+* **For the backend system's internal structure: The `Uphbt.Api` project (your Web API) is the Backend's Presentation Layer (or API Layer). It's the component that *presents* the functionality of your backend services (from the `Uphbt.Services` layer and underlying `Uphbt.Domain` logic) to external clients. It defines how those internal services are exposed and consumed.**
+
+**It's "presenting" the backend's capabilities in a structured format (JSON, XML) over HTTP to any client that needs to consume them, including your frontends.**
+
+**You are correct that the frontend (Angular or React in your case) is unequivocally the user-facing presentation layer. Its primary responsibility is to render the User Interface (UI), display data to the user, capture user input, and manage the user's experience.**
+
+**The confusion arises from using "presentation layer" to describe two different things based on the scope:**
+
+1. **Overall System Architecture (User's Perspective): Frontend is the presentation layer.**  
+2. **Backend's Internal Architecture (API's Perspective): The Web API is the presentation layer for the backend's services.**
+
+**A REST API (and by extension, a .NET Web API implementing REST principles) primarily resides in the Application Layer (sometimes also referred to as the API Layer or Facade Layer) of a larger system architecture.**
+
+**Here's a common breakdown of how it fits into a traditional n-tier or layered architecture:**
+
+* **Presentation Layer (UI Layer): This is your Angular and React frontends. It's focused on the user experience.**  
+* **Application Layer (API Layer / Service Layer): This is where your Web API (`Uphbt.Api` project) sits. Its responsibilities include:**  
+  * **Exposing a consistent interface (the REST endpoints) to clients.**  
+  * **Handling incoming requests (routing, deserialization, authentication, authorization).**  
+  * **Coordinating with the business/domain logic. It acts as a gateway or a "waiter" for the backend, taking orders from clients and passing them to the "kitchen" (your domain and service layers).**  
+* **Domain/Business Logic Layer: This is your `Uphbt.Domain` and `Uphbt.Services` projects. This layer contains the core business rules, entities, and operations.**  
+* **Data Access Layer (Persistence Layer): This is your `Uphbt.Data` project (Entity Framework Core). It handles communication with the database.**
+
+**So, while the Web API serves as the presentation layer for the backend's capabilities, in the broader context of a multi-tier application, it's typically categorized as part of the Application Layer or an API Gateway between the UI and the core business logic.**
