@@ -80,7 +80,7 @@
   * **Define internal primary keys as `long` (mapping to `BIGINT IDENTITY` in SQL Server) and all foreign keys should also be `long`.**  
   * **Each entity (e.g., User, Bug, Comment) should also have a `Guid PublicId` property that is unique and will be exposed to the application layer.**  
   * **Include a `byte[] RowVersion` property on entities (starting with User) for optimistic concurrency.**  
-  * **Layered architecture (Api, Services, Data, Domain), core DB schema (Users), EF Core configuration for persistence-ignorant entities using Fluent API.**  
+  * **Layered architecture (Api, Contracts, Services, Data, Domain), core DB schema (Users), EF Core configuration for persistence-ignorant entities using Fluent API.**  
   * **Authentication & Authorization (BFF Pattern for SPAs):**  
     * **Integrate OpenIddict to act as the OAuth 2.0 Authorization Server and OpenID Connect Provider, issuing JWTs (Access and Refresh Tokens).**  
     * **Configure OpenIddict for the Authorization Code Flow with PKCE for secure SPA authentication.**  
@@ -107,14 +107,17 @@
   * **Initial Migrations: Generate and apply the initial Entity Framework Core database migration for Identity and core application entities.**  
   * **HTTPS Configuration: Configure the `uphbt-backend`'s Web API project to run using HTTPS, ensuring secure communication for all endpoints, especially for development and local testing.**  
 * **Optimal Prompt(s):**  
-  * **"Provide the `dotnet CLI` commands to generate a .NET 9 solution named 'Uphbt'. Then, generate the following projects within this solution, keeping in mind their architectural roles and the goal of persistence-ignorance:**  
+  * **"Provide the `dotnet CLI` commands to generate a .NET 9 solution named 'Uphbt'. Then, generate the following projects within this solution, keeping in mind their architectural roles and the goal of persistence-ignorance and the correct dependency flow for DTOs:**  
     * **`Uphbt.Api` (an HTTPS-based webapi project with controllers, and uses Swagger. This project serves as the Backend's Presentation Layer, exposing the backend's capabilities via RESTful endpoints. Provide an instruction how to add and configure Swagger UI to .NET 9 Web API as SwaggerUI is no longer included by default)**  
+    * **`Uphbt.Contracts` (a class library, specifically for Data Transfer Objects (DTOs) and shared contracts between `Uphbt.Api` and `Uphbt.Services`)**  
     * **`Uphbt.Services` (a class library, representing the application layer)**  
     * **`Uphbt.Data` (a class library, responsible for infrastructure/persistence, which will contain EF Core configuration for persistence-ignorant POCOs using Fluent API)**  
     * **`Uphbt.Domain` (a class library, containing the rich, persistence-ignorant domain model, including entities, value objects, and repository interfaces). After project creation, provide the `dotnet add reference` commands to set up the following clean architecture project references:**  
     * **`Uphbt.Api` \-\> `Uphbt.Services`**  
+    * **`Uphbt.Api` \-\> `Uphbt.Contracts`**  
     * **`Uphbt.Services` \-\> `Uphbt.Data`**  
     * **`Uphbt.Services` \-\> `Uphbt.Domain`**  
+    * **`Uphbt.Services` \-\> `Uphbt.Contracts`**  
     * **`Uphbt.Data` \-\> `Uphbt.Domain` Ensure the generated solution and projects are compatible with .NET 9 and fully utilize C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types)."**  
   * **"Generate the `ApplicationDbContext` for a .NET 9 Web API using EF Core with SQL Server. This `DbContext` should integrate ASP.NET Core Identity with `ApplicationUser : IdentityUser<long>` and `ApplicationRole : IdentityRole<long>`, and also include an initial Bug entity with `long Id`, `Guid PublicId`, and `byte[] RowVersion`. Provide the necessary `Program.cs` EF Core configuration for SQL Server."**  
   * **"Show me how to set up OpenIddict as an Authorization Server in a .NET 9 Web API using `Program.cs`. Configure it for Authorization Code Flow with PKCE, Refresh Token Flow, define client applications (e.g., for Angular and React SPAs with specific `ClientId` and `RedirectUris`), set short access token lifetimes and longer refresh token lifetimes, and integrate with ASP.NET Core Identity. Explain how OpenIddict's setup enables Refresh Token Rotation and Reuse Detection."**  
@@ -199,8 +202,8 @@
   * **Define Value Objects (e.g., `BugStatus`, `Severity`, `Priority`) as immutable types where appropriate.**  
   * **Ensure Bug and Comment entities also include `Guid PublicId` and `byte[] RowVersion` properties for API exposure and optimistic concurrency, respectively.**  
   * **Repository Pattern Implementation: Create dedicated EF Core repositories (`IBugRepository`, `ICommentRepository`) for data persistence, returning domain entities.**  
-  * **Service Layer Implementation: Develop application services (`BugService`, `CommentService`) to orchestrate domain operations, handle transactions, and interact with repositories. Services will be lean, delegating complex logic to the rich domain model.**  
-  * **DTOs: Implement Data Transfer Objects (DTOs) for API requests and responses, with clear mapping between DTOs and domain entities.**  
+  * **Service Layer Implementation: Develop application services (`BugService`, `CommentService`) to orchestrate domain operations, handle transactions, and interact with repositories. Services will be lean, delegating complex logic to the rich domain model. These services will accept and return DTOs defined in `Uphbt.Contracts`.**  
+  * **DTOs: The `Uphbt.Api` layer will use Data Transfer Objects (DTOs) from `Uphbt.Contracts` for API requests and responses, with clear mapping between DTOs and domain entities/service layer results.**  
   * **API Endpoints for CRUD: Create comprehensive RESTful API endpoints for:**  
     * **Creating, reading (list with filtering/sorting/pagination, by PublicId), updating, and deleting Bugs.**  
     * **Adding, reading (by Bug PublicId), updating, and deleting Comments.**  
@@ -212,8 +215,8 @@
 * **Optimal Prompt(s):**  
   * **"Design a rich domain model for a 'Bug' entity in C\# for a .NET 9 application. Include `long Id`, `Guid PublicId`, `byte[] RowVersion`, `Title`, `Description`, `Severity`, `Status` (Value Object), `AssignedToUserId`, `ReportedByUserId`. Include methods like `ChangeStatus(newStatus)`, `AssignTo(userId)`, `AddComment(comment)`. Ensure it enforces invariants."**  
   * **"How to implement an `IBugRepository` interface and its EF Core implementation (`BugRepository`) in .NET 9, including methods for optimistic concurrency (`RowVersion`) and retrieving entities by `PublicId`?"**  
-  * **"Provide a `BugService` example in .NET 9 that uses the `IBugRepository`, orchestrates operations on the Bug domain entity, and handles DTO mapping."**  
-  * **"Generate RESTful API endpoints in a .NET 9 Web API for CRUD operations on 'Bug' entities (using their `PublicId`s), including `[Authorize]` attributes (e.g., allowing only authenticated users to create, and 'Admin' role to delete), and demonstrate handling optimistic concurrency conflicts with `RowVersion`."**  
+  * **"Provide a `BugService` example in .NET 9 that uses the `IBugRepository`, orchestrates operations on the Bug domain entity, and accepts/returns DTOs from `Uphbt.Contracts` while handling DTO to domain entity mapping."**  
+  * **"Generate RESTful API endpoints in a .NET 9 Web API for CRUD operations on 'Bug' entities (using their `PublicId`s) that accept and return DTOs from `Uphbt.Contracts`. Include `[Authorize]` attributes (e.g., allowing only authenticated users to create, and 'Admin' role to delete), and demonstrate handling optimistic concurrency conflicts with `RowVersion`."**  
   * **"Guide me through securing an ASP.NET Core SignalR Hub using cookie-based authentication in .NET 9, ensuring users are authenticated via the HttpOnly session cookie before connecting."**  
   * **"Show how to broadcast real-time updates from a SignalR Hub (`BugHub`) to connected clients (e.g., when a bug's status changes or a new comment is added) from a service layer."**
 
@@ -258,7 +261,7 @@
 * **Optimal Prompt(s):**  
   * **"How to integrate Serilog into a .NET 9 Web API for structured logging, including logging contextual information like the authenticated user's `PublicId` (derived from the server-side managed JWT) and using different log sinks?"**  
   * **"Provide a C\# example of a global exception handling middleware that catches exceptions and maps them to RFC 7807 `ProblemDetails` responses in a .NET 9 Web API."**  
-  * **"Show me how to use FluentValidation to define and apply validation rules for a DTO in a .NET 9 Web API, ensuring validation failures are returned as `ProblemDetails`."**  
+  * **"Show me how to use FluentValidation to define and apply validation rules for a DTO in `Uphbt.Contracts` and use them for a DTO in a .NET 9 Web API, ensuring validation failures are returned as `ProblemDetails`."**  
   * **"Guide me through creating a custom authorization policy in ASP.NET Core (.NET 9\) that verifies if the authenticated user (identified by `PublicId` from the server-side managed JWT) has permission to edit a specific bug (e.g., if they are the reporter or an client)."**
 
     #### **3.2. Frontend: Enhancements (Angular & React)**
