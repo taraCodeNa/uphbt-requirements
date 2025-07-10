@@ -14,9 +14,10 @@ To develop a comprehensive bug and project tracking system comprising a robust .
 
 ## **Overall Technology Stack:**
 
-* **Backend:** .NET Web API (latest LTS \- .NET 9\) with C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types), **Swagger/OpenAPI for API Documentation**. Business logic will be primarily implemented in the Rich Domain Model layer, with the Service layer handling orchestration and logic that cannot be performed by entities themselves.  
+* **Backend:** .NET Web API (latest LTS \- .NET 9\) with C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types). The backend will strictly adhere to a **Rich Domain Model** design, where **domain entities are pure Plain Old C\# Objects (POCOs), completely persistence-ignorant, with no Entity Framework Core specific attributes or interfaces**. All ORM mapping, including properties like `RowVersion` for optimistic concurrency, will be configured exclusively in the `Uphbt.Data` project using **Entity Framework Core's Fluent API**.  
+  * **Swagger/OpenAPI for API Documentation**. Business logic will be primarily implemented in the Rich Domain Model layer, with the Service layer handling orchestration and logic that cannot be performed by entities themselves.  
   * **Database:** SQL Server (latest stable version).  
-  * **ORM:** Entity Framework Core, configured to support **persistence-ignorant domain models** through explicit mapping.  
+  * **ORM:** Entity Framework Core.  
   * **Authentication:** OpenIddict (for OAuth 2.0 / OpenID Connect with JWTs and Refresh Tokens), ASP.NET Core Identity (for user management), BCrypt.Net-Next for password hashing.  
     * **Token Storage:** Access Token and Refresh Token will be issued by OpenIddict and stored directly in **HttpOnly, Secure, SameSite=Lax (or Strict) cookies** on the client-side. The SPA will not access these tokens via JavaScript directly, but the browser will automatically send them with API requests.  
     * **JWT Payload:** The JWT (Access Token) payload will include standard claims such as `sub` (user ID), `name`, `email`, and critically, **`role` claims for authorization**.  
@@ -80,11 +81,12 @@ To develop a comprehensive bug and project tracking system comprising a robust .
 #### **1.1. Backend (.NET) & Database Setup**
 
 * **Action:**  
-  * Initial project setup with a Rich Domain Model design, emphasizing **persistence-ignorance (POCOs without EF Core specific attributes/interfaces in the domain layer)**. Domain entities will encapsulate their own behavior, containing methods that represent business operations and enforce invariants.  
+  * Initial project setup with a Rich Domain Model design. **All domain entities in `Uphbt.Domain` will be pure Plain Old C\# Objects (POCOs)**. This means they will not contain any Entity Framework Core-specific attributes (e.g., `[Table]`, `[Column]`, `[Key]`, `[Timestamp]`) or implement any EF Core-specific interfaces.  
   * Define internal primary keys for *domain entities* as `long` (mapping to `BIGINT IDENTITY` in SQL Server) and all foreign keys should also be `long`.  
   * Each *domain entity* (e.g., Bug, Comment) should also have a `Guid PublicId` property that is unique and will be exposed to the application layer.  
-  * Include a `byte[] RowVersion` property on entities (starting with User, but now handled in `Uphbt.Identity`) for optimistic concurrency.  
-  * Layered architecture (**Api**, **Contracts**, Services, Data, Domain, **Identity**), core DB schema (Users), **EF Core configuration for persistence-ignorant entities using Fluent API**.  
+  * Include a `byte[] RowVersion` property on relevant domain entities (e.g., Bug, and also on the `User` entity within `Uphbt.Identity`) for optimistic concurrency. **The mapping of this `RowVersion` property to the database's `rowversion` or `timestamp` column will be configured exclusively in `Uphbt.Data` using EF Core's Fluent API.**  
+  * Layered architecture (`Api`, `Contracts`, Services, Data, Domain, `Identity`), core DB schema (Users).  
+  * **EF Core Configuration:** Configure `ApplicationDbContext` and all entity mappings in `Uphbt.Data` using **Fluent API** within the `OnModelCreating` method. This includes defining primary keys, relationships, column types, and specifically, marking the `RowVersion` property for optimistic concurrency using `IsRowVersion()`.  
   * **Authentication & Authorization (SPA-friendly, HttpOnly Cookies):**  
     * Integrate OpenIddict to act as the OAuth 2.0 Authorization Server and OpenID Connect Provider, issuing JWTs (Access and Refresh Tokens).  
     * Configure OpenIddict for the Authorization Code Flow with PKCE for secure SPA authentication.  
@@ -106,7 +108,7 @@ To develop a comprehensive bug and project tracking system comprising a robust .
   * **Specific for Identity (with `Uphbt.Identity` Project):**  
     * **`Uphbt.Identity` project creation:** This new project will house your custom `User` entity and related Identity types.  
     * Define the **`User` entity in `Uphbt.Identity`** which **WILL inherit from `IdentityUser<long>`**. This `User` will be the primary representation of a user across your application and identity layers.  
-    * Ensure this `User` entity includes core application-specific properties like `Guid PublicId` (for public exposure, distinct from `Id` inherited from `IdentityUser<long>`), `string FullName`, `DateTime? DateHired`. While it lives in `Uphbt.Identity`, it represents the concrete application-level user model used by ASP.NET Core Identity.  
+    * Ensure this `User` entity also includes a `Guid PublicId` (for public exposure, distinct from `Id` inherited from `IdentityUser<long>`), `string FullName`, `DateTime? DateHired`, and crucially, a `byte[] RowVersion` property. **This `User` entity will also be a POCO, without EF Core attributes.**  
     * The `Uphbt.Identity` project **will have a package reference to `Microsoft.AspNetCore.Identity`**.  
     * In `Uphbt.Data`, `ApplicationDbContext` will derive from **`IdentityDbContext<User, IdentityRole<long>, long>`** (where `User` now refers to `Uphbt.Identity.User`). This means Identity will use the built-in `IdentityRole<long>` for roles; you will not define a custom `Role` class *unless* you later need to add custom properties to the roles table.  
     * `UserManager<User>` and `SignInManager<User>` (operating on `Uphbt.Identity.User`) will be used by services in `Uphbt.Services` (or dedicated authentication services) to manage users and sign-in operations.  
@@ -131,11 +133,10 @@ To develop a comprehensive bug and project tracking system comprising a robust .
     * `Uphbt.Services` \-\> **`Uphbt.Identity`**  
     * `Uphbt.Data` \-\> `Uphbt.Domain`  
     * `Uphbt.Data` \-\> **`Uphbt.Identity`**  
-    * **`Uphbt.Identity` \-\> `Microsoft.AspNetCore.Identity`** (package reference)   
-        
-      Ensure the generated solution and projects are compatible with .NET 9 and fully utilize C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types). Crucially, explain that `Uphbt.Data` will have a package reference to `Microsoft.AspNetCore.Identity.EntityFrameworkCore` and `Microsoft.EntityFrameworkCore.SqlServer`."  
-  * "Generate a custom `User` entity in C\# for the new **`Uphbt.Identity`** project. It should inherit from `IdentityUser<long>` and include additional application-specific properties like `Guid PublicId`, `string FullName`, `DateTime? DateHired`. This `User` entity will be used for ASP.NET Core Identity's user management."  
-  * "Generate the `ApplicationDbContext` for a .NET 9 Web API using EF Core with SQL Server. This `DbContext` should now reside in `Uphbt.Data` and derive from `IdentityDbContext<Uphbt.Identity.User, IdentityRole<long>, long>`. Provide the necessary `Program.cs` EF Core configuration for SQL Server, including how to register `UserManager<Uphbt.Identity.User>`, `SignInManager<Uphbt.Identity.User>`, and `RoleManager<IdentityRole<long>>`."  
+    * **`Uphbt.Identity` \-\> `Microsoft.AspNetCore.Identity`**  
+      (package reference) Ensure the generated solution and projects are compatible with .NET 9 and fully utilize C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types). Crucially, explain that `Uphbt.Data` will have a package reference to `Microsoft.AspNetCore.Identity.EntityFrameworkCore` and `Microsoft.EntityFrameworkCore.SqlServer`."  
+  * "Generate a custom `User` entity in C\# for the new **`Uphbt.Identity`** project. It should inherit from `IdentityUser<long>` and include additional application-specific properties like `Guid PublicId`, `string FullName`, `DateTime? DateHired`, and `byte[] RowVersion` for optimistic concurrency. This `User` entity **must be a pure POCO, with no EF Core specific attributes like `[Timestamp]`**."  
+  * "Generate the `ApplicationDbContext` for a .NET 9 Web API using EF Core with SQL Server. This `DbContext` should now reside in `Uphbt.Data` and derive from `IdentityDbContext<Uphbt.Identity.User, IdentityRole<long>, long>`. Within its `OnModelCreating` method, demonstrate how to use **Fluent API** to configure the `Uphbt.Identity.User` entity's `RowVersion` property for optimistic concurrency (`IsRowVersion()`) and any other necessary mappings. Provide the necessary `Program.cs` EF Core configuration for SQL Server, including how to register `UserManager<Uphbt.Identity.User>`, `SignInManager<Uphbt.Identity.User>`, and `RoleManager<IdentityRole<long>>`."  
   * "Show me how to set up OpenIddict as an Authorization Server in a .NET 9 Web API using `Program.cs`. Configure it for Authorization Code Flow with PKCE, Refresh Token Flow. Define client applications (e.g., for Angular and React SPAs with specific `ClientId` and `RedirectUris`), set short access token lifetimes and longer refresh token lifetimes. Crucially, demonstrate how to issue both the **Access Token and Refresh Token as HttpOnly, Secure, SameSite=Lax cookies** upon successful authentication, instead of returning them in the response body. Ensure the JWT payload includes `role` claims for authorization (by requesting `roles` scope). Explain how OpenIddict's setup enables Refresh Token Rotation and Reuse Detection."  
   * "Provide a C\# `AuthController` (or `LoginController`) in a .NET 9 Web API that handles user login and registration by interacting directly with `SignInManager<Uphbt.Identity.User>` and `UserManager<Uphbt.Identity.User>`. This controller should **not** use any built-in .NET Identity UI. After successful login, it should use OpenIddict to issue **HttpOnly, Secure, SameSite=Lax cookies containing the Access Token and Refresh Token**. Include a secure logout endpoint that explicitly clears these cookies and revokes the refresh token if applicable."  
   * "How to implement BCrypt.Net-Next for password hashing within ASP.NET Core Identity in a .NET 9 application, using `Uphbt.Identity.User`."  
@@ -214,11 +215,11 @@ To develop a comprehensive bug and project tracking system comprising a robust .
 #### **2.1. Backend: Bug & Comment Management API (uphbt-backend)**
 
 * **Action:**  
-  * **Rich Domain Model Implementation:** Implement Bug and Comment as rich domain entities with encapsulated business logic. Entities will have methods that represent business operations (`Bug.AssignUser()`, `Bug.ChangeStatus()`, `Bug.AddComment()`) and enforce their own invariants.  
+  * **Rich Domain Model Implementation:** Implement Bug and Comment as rich domain entities. These entities **will be pure POCOs without any EF Core attributes or specific interfaces**. They will encapsulate their own behavior, containing methods that represent business operations (`Bug.AssignUser()`, `Bug.ChangeStatus()`, `Bug.AddComment()`) and enforce their own invariants.  
   * Define Value Objects (e.g., `BugStatus`, `Severity`, `Priority`) as immutable types where appropriate.  
-  * Ensure Bug and Comment entities also include `Guid PublicId` and `byte[] RowVersion` properties for API exposure and optimistic concurrency, respectively.  
-  * **Repository Pattern Implementation:** Create dedicated EF Core repositories (`IBugRepository`, `ICommentRepository`, `IUserRepository`) for data persistence, returning domain entities. `IUserRepository` will manage `Uphbt.Identity.User` entities.  
-  * **Service Layer Implementation:** Develop application services (`BugService`, `CommentService`, `UserService`) to orchestrate domain operations, handle transactions, and interact with repositories. Services will be lean, delegating complex logic to the rich domain model. These services will accept and return DTOs defined in `Uphbt.Contracts`. The `UserService` will directly leverage `UserManager<Uphbt.Identity.User>` and `SignInManager<Uphbt.Identity.User>` for user management (registration, profile updates, password changes, role assignments).  
+  * Ensure Bug and Comment entities also include `Guid PublicId` and `byte[] RowVersion` properties for API exposure and optimistic concurrency, respectively. **The mapping of `RowVersion` for optimistic concurrency will be done exclusively in `Uphbt.Data` via Fluent API, respecting the persistence-ignorant nature of the domain model.**  
+  * **Repository Pattern Implementation:** Create dedicated EF Core repositories (`IBugRepository`, `ICommentRepository`, `IUserRepository`) in `Uphbt.Data` for data persistence. These repositories will operate on and return your **pure domain entities (POCOs)**. `IUserRepository` will manage `Uphbt.Identity.User` entities.  
+  * **Service Layer Implementation:** Develop application services (`BugService`, `CommentService`, `UserService`) in `Uphbt.Services` to orchestrate domain operations, handle transactions, and interact with repositories. Services will be lean, delegating complex logic to the rich domain model. These services will accept and return DTOs defined in `Uphbt.Contracts`. The `UserService` will directly leverage `UserManager<Uphbt.Identity.User>` and `SignInManager<Uphbt.Identity.User>` for user management (registration, profile updates, password changes, role assignments).  
   * **DTOs:** The `Uphbt.Api` layer will use Data Transfer Objects (DTOs) from `Uphbt.Contracts` for API requests and responses, with clear mapping between DTOs and domain entities/service layer results.  
   * **API Endpoints for CRUD:** Create comprehensive RESTful API endpoints for:  
     * Creating, reading (list with filtering/sorting/pagination, by PublicId), updating, and deleting Bugs.  
@@ -230,37 +231,14 @@ To develop a comprehensive bug and project tracking system comprising a robust .
     * Secure SignalR Hubs using cookie-based authentication (as the frontend will send the HttpOnly token cookies). The primary goal is to ensure only authenticated users with valid sessions can connect and receive updates.  
     * Send real-time notifications to connected clients upon relevant CRUD operations (e.g., "new bug created," "comment added to bug," "bug status changed").  
 * **Optimal Prompt(s):**  
-  * "Design a rich domain model for a 'Bug' entity in C\# for a .NET 9 application. Include `long Id`, `Guid PublicId`, `byte[] RowVersion`, `Title`, `Description`, `Severity`, `Status` (Value Object), `AssignedToUserId`, `ReportedByUserId`. Include methods like `ChangeStatus(newStatus)`, `AssignTo(userId)`, `AddComment(comment)`. Ensure it enforces invariants."  
-  * "How to implement an `IBugRepository` interface and its EF Core implementation (`BugRepository`) in .NET 9, including methods for optimistic concurrency (`RowVersion`) and retrieving entities by `PublicId`?"  
+  * "Design a **persistence-ignorant** rich domain model for a 'Bug' entity in C\# for a .NET 9 application. Include `long Id`, `Guid PublicId`, `Title`, `Description`, `DateTime CreatedDate`, `string Status`, and `byte[] RowVersion`. Include methods like `ChangeStatus(newStatus)`, `AssignTo(userId)`, `AddComment(comment)`. This class **must be a pure POCO with no EF Core specific attributes like `[Timestamp]`**, respecting the architectural goal of persistence ignorance."  
+  * "How to implement an `IBugRepository` interface and its EF Core implementation (`BugRepository`) in .NET 9, ensuring it works with the **persistence-ignorant `Bug` POCO** and includes methods for optimistic concurrency (`RowVersion`) and retrieving entities by `PublicId`?"  
+  * "In `Uphbt.Data`, within `ApplicationDbContext`'s `OnModelCreating` method, show me the **Fluent API configuration for the `Bug` entity** to map its `RowVersion` property for optimistic concurrency (`IsRowVersion()`) and any other necessary column mappings. Assume the `Bug` class is a **pure POCO without any attributes**."  
   * "Provide a `BugService` example in .NET 9 that uses the `IBugRepository`, orchestrates operations on the Bug domain entity, and accepts/returns DTOs from `Uphbt.Contracts` while handling DTO to domain entity mapping."  
   * "Generate RESTful API endpoints in a .NET 9 Web API for CRUD operations on 'Bug' entities (using their `PublicId`s) that accept and return DTOs from `Uphbt.Contracts`. Include `[Authorize]` attributes (e.g., allowing only authenticated users to create, and 'Admin' role to delete), and demonstrate handling optimistic concurrency conflicts with `RowVersion`."  
   * "Guide me through securing an ASP.NET Core SignalR Hub using cookie-based authentication in .NET 9, relying on the HttpOnly token cookies for authentication, and ensuring users are authenticated before connecting."  
   * "Show how to broadcast real-time updates from a SignalR Hub (`BugHub`) to connected clients (e.g., when a bug's status changes or a new comment is added) from a service layer."  
   * "How to implement a `UserService` (using `UserManager<Uphbt.Identity.User>` and `SignInManager<Uphbt.Identity.User>`) in `Uphbt.Services` for user registration, profile updates, and role assignments, directly operating on the `Uphbt.Identity.User` entity, and without using Identity's built-in UI."
-
-#### **2.2. Frontend: Bug & Comment Management UI (Angular & React)**
-
-* **Action:**  
-  * **Core UI Components:** Develop comprehensive UI components for:  
-    * Bug listing (including filtering, sorting, and pagination).  
-    * Bug detail view, displaying all relevant properties and associated comments.  
-    * Bug creation and editing forms.  
-    * Components for displaying existing comments and adding new comments to a bug.  
-    * **User profile viewing and editing.**  
-    * Utilize Angular Material / MUI for a consistent, accessible, and professional user interface.  
-  * **API Integration:** Integrate with the backend API endpoints for all CRUD operations. Ensure all requests implicitly send the HttpOnly token cookies via the browser. Implement robust error handling and provide clear user feedback for API calls.  
-  * **Real-time Updates with SignalR:**  
-    * Implement SignalR client-side integration in both Angular and React applications.  
-    * Connect to the backend SignalR Hubs, relying on the browser to send the HttpOnly token cookies for authentication.  
-    * Subscribe to relevant real-time events (e.g., `bugAdded`, `bugUpdated`, `commentAdded`).  
-    * Dynamically update the UI in real-time based on incoming notifications (e.g., new bugs appearing instantly, comments showing up without page refresh, bug status updates).  
-* **Optimal Prompt(s):**  
-  * "Generate an Angular component for a paginated, sortable, and filterable bug list using Angular Material `mat-table`. Include an example of how to fetch data from the API and handle loading states, ensuring the browser implicitly sends HttpOnly token cookies."  
-  * "Create a React component for a bug detail page that fetches bug data by `PublicId`, displays associated comments, and includes a form to add new comments, using MUI and React Hook Form. Demonstrate optimistic UI updates, ensuring API calls are made with browser-sent HttpOnly token cookies."  
-  * "How to integrate the SignalR client into an Angular application, ensuring the client connects to a secure Hub by relying on the browser to send the HttpOnly token cookies for authentication, and subscribes to real-time bug updates."  
-  * "Show me how to connect to a SignalR Hub in a React application using a custom hook, relying on the browser to send the HttpOnly token cookies for authentication, and display real-time comments for a specific bug using `useState`."  
-  * "Provide an example of an Angular service method that calls a PUT API endpoint for updating a bug, handles `RowVersion` for optimistic concurrency, and provides user feedback, with the browser implicitly sending HttpOnly token cookies."  
-  * "Generate a React component for viewing and editing a user's profile information (using React Hook Form and MUI), fetching data from and sending updates to the backend API, with API calls implicitly sending HttpOnly token cookies."
 
 ---
 
@@ -313,8 +291,9 @@ To develop a comprehensive bug and project tracking system comprising a robust .
       * Verification of OpenIddict's Refresh Token Rotation and acquisition of new JWTs in new cookies transparently.  
       * Crucially, test the detection of refresh token reuse (simulating a stolen token attempt on the backend) and verification of proper full session invalidation (all tokens in the chain revoked, cookies cleared).  
     * Test authorization policies (role-based, custom policies) based on role claims in the JWT.  
+    * **Verify Persistence Ignorance:** Ensure that unit tests for domain entities do not depend on EF Core or data access concerns, reinforcing their POCO nature.  
 * **Optimal Prompt(s):**  
-  * "How to write unit tests for a C\# rich domain entity (e.g., Bug) using xUnit and Moq, focusing on testing its business methods and invariants?"  
+  * "How to write unit tests for a C\# **persistence-ignorant** rich domain entity (e.g., Bug POCO) using xUnit and Moq, focusing solely on testing its business methods and invariants without any EF Core dependencies?"  
   * "Guide me through setting up integration tests for a .NET 9 Web API controller using `WebApplicationFactory`, including testing API endpoint functionality and data persistence with an in-memory database or test database."  
   * "Show me how to write integration tests for a .NET 9 Web API that verify the OpenIddict authentication flow with HttpOnly token cookies, including login (token cookie issuance where the JWT includes role claims), access to protected resources with a valid token cookie, and handling invalid/expired token cookies."  
   * "How to write integration tests to verify OpenIddict's Refresh Token Rotation and Reuse Detection with HttpOnly token cookies in a .NET 9 Web API, simulating token theft and ensuring proper session invalidation?"  
