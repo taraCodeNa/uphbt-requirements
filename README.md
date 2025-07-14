@@ -15,7 +15,7 @@ To develop a comprehensive bug and project tracking system comprising a robust .
 ## **Overall Technology Stack:**
 
 * **Backend:** .NET Web API (latest LTS \- .NET 9\) with C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types). The backend will strictly adhere to a **Rich Domain Model** design, where **domain entities are pure Plain Old C\# Objects (POCOs), completely persistence-ignorant, with no Entity Framework Core specific attributes or interfaces**. All ORM mapping, including properties like `RowVersion` for optimistic concurrency, will be configured exclusively in the `Uphbt.Data` project using **Entity Framework Core's Fluent API**.  
-  * **Swagger/OpenAPI for API Documentation**. Business logic will be primarily implemented in the Rich Domain Model layer, with the Service layer handling orchestration and logic that cannot be performed by entities themselves.  
+  * **OpenAPI / Scalar for API Documentation**. Business logic will be primarily implemented in the Rich Domain Model layer, with the Service layer handling orchestration and logic that cannot be performed by entities themselves.  
   * **Database:** SQL Server (latest stable version).  
   * **ORM:** Entity Framework Core.  
   * **Authentication:** OpenIddict (for OAuth 2.0 / OpenID Connect with JWTs and Refresh Tokens), ASP.NET Core Identity (for user management), BCrypt.Net-Next for password hashing.  
@@ -100,10 +100,10 @@ To develop a comprehensive bug and project tracking system comprising a robust .
       * The frontend (SPA) will **NOT** directly read these tokens via JavaScript. The browser will automatically send these HttpOnly token cookies with every subsequent request to the backend.  
       * The backend will then validate the Access Token from the cookie for each request. If the Access Token is expired but a valid Refresh Token cookie is present, the backend will transparently use the Refresh Token to acquire a new Access Token and Refresh Token, then issue new cookies.  
     * **Custom Login/Logout Endpoints (No Identity UI):** Create custom API endpoints for user login, registration, and logout. These endpoints will interact directly with ASP.NET Core Identity's `UserManager` and `SignInManager` and OpenIddict to manage the authentication flow and issue/clear the token cookies. **No Razor Pages UI provided by ASP.NET Core Identity will be used.**  
-    * **Client Configuration:** Dynamically or statically register your Angular and React clients within OpenIddict's configuration/database, specifying `ClientId`, `RedirectUris`, `PostLogoutRedirectUris`, and allowed `GrantTypes`/`Scopes` (including `openid`, `profile`, `email`, **`roles`**, `offline_access`).  
+    * **Client Configuration:** Dynamically or statically register your Angular and React clients within OpenIddict's configuration/database, specifying `ClientId`, `RedirectUris`, `PostLogoutRedirectUis`, and allowed `GrantTypes`/`Scopes` (including `openid`, `profile`, `email`, **`roles`**, `offline_access`).  
     * Use BCrypt.Net-Next for secure password hashing within ASP.NET Core Identity.  
   * **I18n/L10n:** Set up server-side internationalization using `Microsoft.Extensions.Localization`.  
-  * **API Documentation (OpenAPI / Swagger):** Integrate **built-in .NET 9 OpenAPI support** and add **Swashbuckle.AspNetCore.SwaggerUI** middleware for API documentation and interactive testing.  
+  * **API Documentation (OpenAPI / Scalar):** Integrate **built-in .NET 9 OpenAPI support** and integrate **Scalar middleware** for API documentation and interactive testing.  
   * **Code Quality:** All C\# code must fully leverage Nullable Reference Types (NRTs) to explicitly define nullability, ensuring properties and method return types reflect whether null is a valid state or value.  
   * **Specific for Identity (with `Uphbt.Identity` Project):**  
     * **`Uphbt.Identity` project creation:** This new project will house your custom `User` entity and related Identity types.  
@@ -118,29 +118,33 @@ To develop a comprehensive bug and project tracking system comprising a robust .
   * **HTTPS Configuration:** Configure the `uphbt-backend`'s **Web API project to run using HTTPS**, ensuring secure communication for all endpoints, especially for development and local testing.  
 * **Optimal Prompt(s):**  
   * "Provide the `dotnet CLI` commands to generate a .NET 9 solution named 'Uphbt'. Then, generate the following projects within this solution, keeping in mind their architectural roles and the adjusted dependency flow:  
-    * **`Uphbt.Api` (an HTTPS-based webapi project with controllers, and uses Swagger. This project serves as the Backend's Presentation Layer, exposing the backend's capabilities via RESTful endpoints. Show how to configure `Microsoft.AspNetCore.OpenApi` and `Swashbuckle.AspNetCore.SwaggerUI` for .NET 9 in `Program.cs`.)**  
+    * **`Uphbt.Api` (an HTTPS-based webapi project with controllers. This project serves as the Backend's Presentation Layer, exposing the backend's capabilities via RESTful endpoints. Show how to configure `Microsoft.AspNetCore.OpenApi` and integrate Scalar middleware for .NET 9 in `Program.cs`.)**  
     * **`Uphbt.Contracts`** (a class library, specifically for **Data Transfer Objects (DTOs)** and shared contracts between `Uphbt.Api` and `Uphbt.Services`)  
-    * **`Uphbt.Services`** (a class library, representing the application layer)  
+    * **`Uphbt.Services`** (a class library, representing the application layer, and where **all infrastructure dependency injection, including `ApplicationDbContext` and Identity stores, will be performed**.)  
     * **`Uphbt.Data`** (a class library, responsible for infrastructure/persistence, which will contain **EF Core configuration for persistence-ignorant POCOs and the `ApplicationDbContext` for Identity**)  
     * **`Uphbt.Domain`** (a class library, containing the **pure, rich, domain model entities, value objects, and repository interfaces *for non-Identity domain entities***).  
     * **`Uphbt.Identity`** (a class library, specifically for **custom ASP.NET Core Identity entities like `User` inheriting `IdentityUser<long>`).** After project creation, provide the `dotnet add reference` commands to set up the following clean architecture project references:  
     * `Uphbt.Api` \-\> `Uphbt.Services`  
     * `Uphbt.Api` \-\> `Uphbt.Contracts`  
-    * `Uphbt.Api` \-\> **`Uphbt.Identity`**  
     * `Uphbt.Services` \-\> `Uphbt.Data`  
     * `Uphbt.Services` \-\> `Uphbt.Domain`  
     * `Uphbt.Services` \-\> `Uphbt.Contracts`  
-    * `Uphbt.Services` \-\> **`Uphbt.Identity`**  
+    * `Uphbt.Services` \-\> `Uphbt.Identity`  
     * `Uphbt.Data` \-\> `Uphbt.Domain`  
-    * `Uphbt.Data` \-\> **`Uphbt.Identity`**  
+    * `Uphbt.Data` \-\> `Uphbt.Identity`  
     * **`Uphbt.Identity` \-\> `Microsoft.AspNetCore.Identity`** (package reference)  
       Ensure the generated solution and projects are compatible with .NET 9 and fully utilize C\# 12 and modern syntax (e.g., file-scoped namespaces, Nullable Reference Types). Crucially, explain that `Uphbt.Data` will have a package reference to `Microsoft.AspNetCore.Identity.EntityFrameworkCore` and `Microsoft.EntityFrameworkCore.SqlServer`."  
   * "Generate a custom `User` entity in C\# for the new **`Uphbt.Identity`** project. It should inherit from `IdentityUser<long>` and include additional application-specific properties like `Guid PublicId`, `string FullName`, `DateTime? DateHired`, and `byte[] RowVersion` for optimistic concurrency. This `User` entity **must be a pure POCO, with no EF Core specific attributes like `[Timestamp]`**."  
-  * "Generate the `ApplicationDbContext` for a .NET 9 Web API using EF Core with SQL Server. This `DbContext` should now reside in `Uphbt.Data` and derive from `IdentityDbContext<Uphbt.Identity.User, IdentityRole<long>, long>`. Within its `OnModelCreating` method, demonstrate how to use **Fluent API** to configure the `Uphbt.Identity.User` entity's `RowVersion` property for optimistic concurrency (`IsRowVersion()`) and any other necessary mappings. Provide the necessary `Program.cs` EF Core configuration for SQL Server, including how to register `UserManager<Uphbt.Identity.User>`, `SignInManager<Uphbt.Identity.User>`, and `RoleManager<IdentityRole<long>>`."  
-  * "Show me how to set up OpenIddict as an Authorization Server in a .NET 9 Web API using `Program.cs`. Configure it for Authorization Code Flow with PKCE, Refresh Token Flow. Define client applications (e.g., for Angular and React SPAs with specific `ClientId` and `RedirectUris`), set short access token lifetimes and longer refresh token lifetimes. Crucially, demonstrate how to issue both the **Access Token and Refresh Token as HttpOnly, Secure, SameSite=Lax cookies** upon successful authentication, instead of returning them in the response body. Ensure the JWT payload includes `role` claims for authorization (by requesting `roles` scope). Explain how OpenIddict's setup enables Refresh Token Rotation and Reuse Detection."  
-  * "Provide a C\# `AuthController` (or `LoginController`) in a .NET 9 Web API that handles user login and registration by interacting directly with `SignInManager<Uphbt.Identity.User>` and `UserManager<Uphbt.Identity.User>`. This controller should **not** use any built-in .NET Identity UI. After successful login, it should use OpenIddict to issue **HttpOnly, Secure, SameSite=Lax cookies containing the Access Token and Refresh Token**. Include a secure logout endpoint that explicitly clears these cookies and revokes the refresh token if applicable."  
+  * "Generate the `ApplicationDbContext` for a .NET 9 Web API using EF Core with SQL Server. This `DbContext` should now reside in `Uphbt.Data` and derive from `IdentityDbContext<Uphbt.Identity.User, IdentityRole<long>, long>`. Within its `OnModelCreating` method, demonstrate how to use **Fluent API** to configure the `Uphbt.Identity.User` entity's `RowVersion` property for optimistic concurrency (`IsRowVersion()`) and any other necessary mappings. Explain that `ApplicationDbContext` and Identity stores will be registered for DI in `Uphbt.Services`."  
+  * "Provide a C\# extension method `AddUphbtInfrastructure` for `IServiceCollection` to be placed in `Uphbt.Services`. This method should encapsulate all necessary dependency injections for the data layer and application services, including:  
+    * Registering `ApplicationDbContext` with `options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))`.  
+    * Configuring ASP.NET Core Identity using `AddIdentity<User, IdentityRole<long>>().AddEntityFrameworkStores<ApplicationDbContext>()`.  
+    * Registering concrete repository implementations (e.g., `BugRepository`, `CommentRepository`, `UserRepository`) from `Uphbt.Data`.  
+    * Registering application services (e.g., `BugService`, `CommentService`, `UserService`) from `Uphbt.Services`. Explain how this centralizes infrastructure configuration and prevents `Uphbt.Api` from referencing `Uphbt.Data` or `Uphbt.Identity` directly for DI purposes."  
+  * "Show me how to set up OpenIddict as an Authorization Server in a .NET 9 Web API using `Program.cs`. Configure it for Authorization Code Flow with PKCE, Refresh Token Flow. Define client applications (e.g., for Angular and React SPAs with specific `ClientId` and `RedirectUris`), set short access token lifetimes and longer refresh token lifetimes. Crucially, demonstrate how to issue both the **Access Token and Refresh Token as HttpOnly, Secure, SameSite=Lax cookies** upon successful authentication, instead of returning them in the response body. Ensure the JWT payload includes `role` claims for authorization (by requesting `roles` scope)."  
+  * "Provide a C\# `AuthController` (or `LoginController`) in a .NET 9 Web API that handles user login and registration by interacting indirectly with `UserManager<Uphbt.Identity.User>` and `SignInManager<Uphbt.Identity.User>` via an injected `IUserService` (from `Uphbt.Services`) that accepts/returns DTOs from `Uphbt.Contracts`. This controller should **not** use any built-in .NET Identity UI. After successful login, it should use OpenIddict to issue **HttpOnly, Secure, SameSite=Lax cookies containing the Access Token and Refresh Token**. Include a secure logout endpoint that explicitly clears these cookies and revokes the refresh token if applicable."  
   * "How to implement BCrypt.Net-Next for password hashing within ASP.NET Core Identity in a .NET 9 application, using `Uphbt.Identity.User`."  
-  * "Guide me on how to perform initial role seeding for 'user' and 'admin' roles using `RoleManager<IdentityRole<long>>` in `Program.cs` (or a dedicated data seeding class) during application startup."  
+  * "Guide me on how to perform initial role seeding for 'user' and 'admin' roles using `RoleManager<IdentityRole<long>>` in `Program.cs` (or a dedicated data seeding class) during application startup, ensuring `RoleManager` is correctly resolved after being configured via `AddUphbtInfrastructure`."  
   * "Generate a basic example of server-side internationalization (i18n) setup in a .NET 9 Web API using `Microsoft.Extensions.Localization` for a `SharedResources.cs` file."  
   * "How to configure **HTTPS for a .NET 9 Web API** in `appsettings.json` and `Program.cs` for development, including setting up a self-signed certificate if necessary for local development."
 
@@ -224,7 +228,7 @@ To develop a comprehensive bug and project tracking system comprising a robust .
   * **API Endpoints for CRUD:** Create comprehensive RESTful API endpoints for:  
     * Creating, reading (list with filtering/sorting/pagination, by PublicId), updating, and deleting Bugs.  
     * Adding, reading (by Bug PublicId), updating, and deleting Comments.  
-    * **Managing User profiles and other non-authentication specific user operations using the `Uphbt.Identity.User` entity and appropriate DTOs.**  
+    * **Managing User profiles and other non-authentication specific user operations using an injected `IUserService` (from `Uphbt.Services`) that accepts/returns DTOs from `Uphbt.Contracts`.**  
   * **Authorization:** Apply robust authorization attributes (`[Authorize]`, `[Authorize(Roles="Admin")]`, or custom policy-based authorization based on `User` claims/roles derived from the validated JWT in the cookie) to all relevant endpoints to ensure only authorized users can perform actions.  
   * **Real-time Communication with SignalR:**  
     * Implement ASP.NET Core SignalR Hubs (e.g., `BugHub`, `CommentHub`) for real-time updates.  
@@ -235,10 +239,10 @@ To develop a comprehensive bug and project tracking system comprising a robust .
   * "How to implement an `IBugRepository` interface and its EF Core implementation (`BugRepository`) in .NET 9, ensuring it works with the **persistence-ignorant `Bug` POCO** and includes methods for optimistic concurrency (`RowVersion`) and retrieving entities by `PublicId`?"  
   * "In `Uphbt.Data`, within `ApplicationDbContext`'s `OnModelCreating` method, show me the **Fluent API configuration for the `Bug` entity** to map its `RowVersion` property for optimistic concurrency (`IsRowVersion()`) and any other necessary column mappings. Assume the `Bug` class is a **pure POCO without any attributes**."  
   * "Provide a `BugService` example in .NET 9 that uses the `IBugRepository`, orchestrates operations on the Bug domain entity, and accepts/returns DTOs from `Uphbt.Contracts` while handling DTO to domain entity mapping."  
-  * "Generate RESTful API endpoints in a .NET 9 Web API for CRUD operations on 'Bug' entities (using their `PublicId`s) that accept and return DTOs from `Uphbt.Contracts`. Include `[Authorize]` attributes (e.g., allowing only authenticated users to create, and 'Admin' role to delete), and demonstrate handling optimistic concurrency conflicts with `RowVersion`."  
+  * "Generate RESTful API endpoints in a .NET 9 Web API for CRUD operations on 'Bug' entities (using their `PublicId`s) that accept and return DTOs from `Uphbt.Contracts`. Inject an `IBugService` (from `Uphbt.Services`) to handle the business logic. Include `[Authorize]` attributes (e.g., allowing only authenticated users to create, and 'Admin' role to delete), and demonstrate handling optimistic concurrency conflicts with `RowVersion`."  
   * "Guide me through securing an ASP.NET Core SignalR Hub using cookie-based authentication in .NET 9, relying on the HttpOnly token cookies for authentication, and ensuring users are authenticated before connecting."  
   * "Show how to broadcast real-time updates from a SignalR Hub (`BugHub`) to connected clients (e.g., when a bug's status changes or a new comment is added) from a service layer."  
-  * "How to implement a `UserService` (using `UserManager<Uphbt.Identity.User>` and `SignInManager<Uphbt.Identity.User>`) in `Uphbt.Services` for user registration, profile updates, and role assignments, directly operating on the `Uphbt.Identity.User` entity, and without using Identity's built-in UI."
+  * "How to implement a `UserService` in `Uphbt.Services` that uses `UserManager<Uphbt.Identity.User>` and `SignInManager<Uphbt.Identity.User>` for user registration, profile updates, and role assignments, accepting and returning DTOs from `Uphbt.Contracts`, thereby abstracting the `Uphbt.Identity.User` entity from the API layer."
 
 ---
 
@@ -318,32 +322,18 @@ To develop a comprehensive bug and project tracking system comprising a robust .
 
 ---
 
-### **Clarification on "Presentation Layer" and REST APIs:**
+## **Clarification on "Presentation Layer" and REST APIs**
 
-When we talk about a **multi-tier or layered architecture** (like the one described for the backend: API, Services, Data, Domain), the term "presentation layer" for the `Uphbt.Api` project refers to its role *within the backend system itself*, not directly to the end-user interface.
+In the context of the .NET Web API and its interaction with Angular/React SPAs, the `Uphbt.Api` project is indeed functioning as the **Presentation Layer** for the backend system.
 
-Think of it this way:
+Here's why and what it implies:
 
-* **For the end-user:** The Angular and React frontends are the **User Interface (UI) Presentation Layer**. This is what the user directly sees and interacts with.  
-* **For the backend system's internal structure:** The `Uphbt.Api` project (your Web API) is the **Backend's Presentation Layer (or API Layer)**. It's the component that *presents* the functionality of your backend services (from the `Uphbt.Services` layer and underlying `Uphbt.Domain` logic) to external clients. It defines how those internal services are exposed and consumed.
+* **Presentation Layer Role:** The `Uphbt.Api` project's primary responsibility is to expose the backend's capabilities to external clients (our Angular and React SPAs) in a consumable format. It defines the public interface of your backend.  
+* **RESTful Endpoints as the Interface:** In a RESTful API, the endpoints (e.g., `/api/bugs`, `/api/users/login`) serve as this public interface. They define the resources, the allowed actions (GET, POST, PUT, DELETE), and the data formats (JSON in our case).  
+* **Receiving and Sending Data:**  
+  * **Incoming Data:** API controllers in `Uphbt.Api` receive HTTP requests from the frontend. These requests contain data (e.g., `BugCreateDto`, `UserLoginDto`) that needs to be processed.  
+  * **Outgoing Data:** After processing the request (which involves delegating to the `Uphbt.Services` layer), the controllers format the results back into DTOs (`BugDetailsDto`, `UserTokenDto` \- though we're using cookies for tokens here, DTOs would still be for user profile data, etc.) and send them back as HTTP responses to the frontend.  
+* **Mapping Responsibility:** A key function of the `Uphbt.Api` layer is **mapping**. It translates incoming DTOs from the HTTP request into the appropriate parameters for service layer calls, and then translates the results from the service layer (e.g., domain entities or service-specific result objects) back into outgoing DTOs for the HTTP response.  
+* **No Business Logic:** Critically, this "Presentation Layer" (the `Uphbt.Api` controllers) should contain **minimal to no business logic**. Its role is strictly to handle HTTP concerns: request parsing, response formatting, authentication/authorization checks (via attributes), and delegating to the application (service) layer. The actual business rules and operations reside in `Uphbt.Services` and `Uphbt.Domain`.
 
-It's "presenting" the backend's capabilities in a structured format (JSON, XML) over HTTP to any client that needs to consume them, including your frontends.
-
-You are **correct** that the frontend (Angular or React in your case) is unequivocally the **user-facing presentation layer**. Its primary responsibility is to render the User Interface (UI), display data to the user, capture user input, and manage the user's experience.
-
-The confusion arises from using "presentation layer" to describe two different things based on the scope:
-
-1. **Overall System Architecture (User's Perspective):** Frontend is the presentation layer.  
-2. **Backend's Internal Architecture (API's Perspective):** The Web API is the presentation layer for the backend's services.
-
-A REST API (and by extension, a .NET Web API implementing REST principles) primarily resides in the **Application Layer** (sometimes also referred to as the **API Layer** or **Facade Layer**) of a larger system architecture:
-
-* **Presentation Layer (UI Layer):** This is your Angular and React frontends. It's focused on the user experience.  
-* **Application Layer (API Layer / Service Layer):** This is where your Web API (`Uphbt.Api` project) sits. Its responsibilities include:  
-  * Exposing a consistent interface (the REST endpoints) to clients.  
-  * Handling incoming requests (routing, deserialization, authentication, authorization).  
-  * Coordinating with the business/domain logic. It acts as a gateway or a "waiter" for the backend, taking orders from clients and passing them to the "kitchen" (your domain and service layers).  
-* **Domain/Business Logic Layer:** This is your `Uphbt.Domain` and `Uphbt.Services` projects. This layer contains the core business rules, entities, and operations.  
-* **Data Access Layer (Persistence Layer):** This is your `Uphbt.Data` project (Entity Framework Core). It handles communication with the database.
-
-So, while the Web API **serves as the presentation layer for the backend's capabilities**, in the broader context of a multi-tier application, it's typically categorized as part of the **Application Layer** or an **API Gateway** between the UI and the core business logic.
+So, stating that `Uphbt.Api` is the "Backend's Presentation Layer, exposing the backend's capabilities via RESTful endpoints" accurately describes its architectural role in this context.
